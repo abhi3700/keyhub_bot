@@ -5,11 +5,6 @@ bot = botogram.create(API_key)
 bot.about = "This is a Key Provider Bot. \nThis provides keys (max. 6 per day) to a user based on information - date, time, user, country"
 bot.owner = "@abhi3700"
 
-@bot.command("hello")
-def hello_command(chat, message, args):
-    """Says Hi to your message"""
-    chat.send("Hey! what's up?")
-
 @bot.command("requestkey")
 def requestkey_command(chat, message, args):
     """Provides key based on user information"""
