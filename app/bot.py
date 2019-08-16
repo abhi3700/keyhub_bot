@@ -26,8 +26,8 @@ def sendinfo_command(chat, message, args):
 
 @bot.callback("username")
 def username_callback(query, chat, message):
-    user = botogram.User()
-    chat.send(user.username)    # test 
+    # user = botogram.User()
+    # chat.send(user.username)    # test 
     # query.notify("<username> saved.")
     query.notify("<username> saved.")
 
