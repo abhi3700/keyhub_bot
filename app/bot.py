@@ -19,7 +19,14 @@ TODO: Button popping from below
 @bot.command("sendinfo")
 def sendinfo_command(chat, message, args):
     """User has to click a button for giving information - Username, Datetime, Location"""
-    chat.send("Please, select one of the buttons popping below.")
+    btns = botogram.Buttons()
+    btns[0].callback("Username", "username")
+    chat.send("Please, select one of the buttons popping below.", attach= btns)
+
+@bot.callback("username")
+def username_callback(query, chat, message):
+    # chat.send("<username> Noted.")
+    query.notify("<username> Noted.")
 
 if __name__ == "__main__":
     bot.run()
