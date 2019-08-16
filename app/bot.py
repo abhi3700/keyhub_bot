@@ -28,11 +28,13 @@ def sendinfo_command(chat, message, args):
 def username_callback(query, chat, message):
     # chat.send(str(botogram.User.username))    # test 
     # query.notify("<username> saved.")
-    query.notify("Username: " + botogram.User().username + "saved.")
+    user = botogram.User()
+    query.notify("Username: " + user.username + "saved.")
 
 @bot.callback("location")
 def location_callback(query, chat, message):
-    chat.send(str(botogram.Location.longitude + "\n" + botogram.Location.latitude))    # test
+    loc = botogram.Location()
+    chat.send(str(loc.longitude) + "\n" + str(loc.latitude))    # test
     query.notify("<location> saved.")
 
 if __name__ == "__main__":
