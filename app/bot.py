@@ -33,8 +33,8 @@ def username_callback(query, chat, message):
 
 @bot.callback("location")
 def location_callback(query, chat, message):
-    loc = botogram.Location()
-    chat.send(str(loc.longitude) + "\n" + str(loc.latitude))    # test
+    # loc = botogram.Location()
+    # chat.send(str(loc.longitude) + "\n" + str(loc.latitude))    # test
     query.notify("<location> saved.")
 
 if __name__ == "__main__":
