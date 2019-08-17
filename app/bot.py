@@ -39,7 +39,7 @@ def sendinfo_command(chat, message, location):
     btns = botogram.Buttons()
     # TODO: replace `message.sender.username` with `save_username(message.sender.username)`
     btns[0].callback("Username", "username", message.sender.username)     # button - Username
-    btns[1].callback("Location", "location", location.longitude)     # button - Location
+    btns[1].callback("Location", "location", location)     # button - Location
     chat.send("Please, select one of the buttons popping below.", attach= btns)
 
 @bot.callback("username")
