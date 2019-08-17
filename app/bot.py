@@ -17,19 +17,17 @@ TODO: Button popping from below
     - Location: When clicked, `location` saved in the database & show msg: "Location noted."
 """
 @bot.command("sendinfo")
-def sendinfo_command(chat, message, args):
+def sendinfo_command(chat, message):
     """User has to click a button for giving information - Username, Datetime, Location"""
     btns = botogram.Buttons()
-    btns[0].callback("Username", "username")     # button - Username
+    btns[0].callback("Username", "username", message.sender.username)     # button - Username
     btns[1].callback("Location", "location")     # button - Location
-    chat.send("Please, select one of the buttons popping below.", attach= btns)
+    chat.send("Please, select one of the buttons popping below." + message.sender.username, attach= btns)
 
 @bot.callback("username")
-def username_callback(query, chat, message):
-    # user = botogram.User()
-    # chat.send(user.username)    # test 
+def username_callback(query, data):
     # query.notify("<username> saved.")
-    query.notify("<username> saved.")
+    query.notify("<username> saved: " + data)
 
 @bot.callback("location")
 def location_callback(query, chat, message):
@@ -39,3 +37,5 @@ def location_callback(query, chat, message):
 
 if __name__ == "__main__":
     bot.run()
+    # user = botogram.User()
+    # print(user.username)
