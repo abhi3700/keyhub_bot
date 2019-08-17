@@ -18,14 +18,6 @@ def requestkey_command(chat, message, args):
     """Provides key based on user information"""
     chat.send("Okay! But I need some of your information. \nUse /sendinfo command.")
 
-"""
-parse the function o/p as argument into `btns.callback` line
-"data":  string
-"return": string
-"""
-def save_username(data):
-    db_status = ""
-    return db_status
 
 """
 TODO: Button popping from below
@@ -34,24 +26,28 @@ TODO: Button popping from below
     - Location: When clicked, `location` saved in the database & show msg: "Location noted."
 """
 @bot.command("sendinfo")
-def sendinfo_command(chat, message, location):
+def sendinfo_command(chat, message, args):
     """User has to click a button for giving information - Username, Datetime, Location"""
     btns = botogram.Buttons()
-    # TODO: replace `message.sender.username` with `save_username(message.sender.username)`
-    btns[0].callback("Username", "username", message.sender.username)     # button - Username
-    btns[1].callback("Location", "location", location)     # button - Location
+    
+    btns[0].callback("Username", "username")     # button - Username
+    btns[1].callback("Location", "location")     # button - Location
+    
     chat.send("Please, select one of the buttons popping below.", attach= btns)
 
 @bot.callback("username")
-def username_callback(query, data):
-    # query.notify("<username> saved.")
-    query.notify("<username>: " + data + " saved." + type(data))
-    # query.notify("<username>: " + type(data) + " saved.")
+def username_callback(query, chat, message):
+    user = query.sender
+    chat.send(user.username)    # test 
+    query.notify("{username} saved.".format(username=user.username))
 
 @bot.callback("location")
-def location_callback(query, data):
-    query.notify("<location>: " + data + " saved." + type(data))
-    # query.notify("<location> saved.")
+def location_callback(query, chat, message, location):
+    loc = location
+    lat = loc.latitude
+    lng = loc.longitude
+    chat.send(str(lat) + " & " + str(lng))      # test
+    query.notify("{latitude} & {longitude} saved.".format(latitude=str(lat), longitude=str(lng)))
 
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
