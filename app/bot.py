@@ -39,20 +39,19 @@ def sendinfo_command(chat, message):
     btns = botogram.Buttons()
     # TODO: replace `message.sender.username` with `save_username(message.sender.username)`
     btns[0].callback("Username", "username", message.sender.username)     # button - Username
-    btns[1].callback("Location", "location")     # button - Location
+    btns[1].callback("Location", "location", message.sender.location.longitude + message.sender.location.longitude)     # button - Location
     chat.send("Please, select one of the buttons popping below.", attach= btns)
 
 @bot.callback("username")
 def username_callback(query, data):
     # query.notify("<username> saved.")
-    query.notify("<username>: " + data + " saved.")
-    query.notify("<username>: " + type(data) + " saved.")
+    query.notify("<username>: " + data + " saved." + type(data))
+    # query.notify("<username>: " + type(data) + " saved.")
 
 @bot.callback("location")
-def location_callback(query, chat, message):
-    # loc = botogram.Location()
-    # chat.send(str(loc.longitude) + "\n" + str(loc.latitude))    # test
-    query.notify("<location> saved.")
+def location_callback(query, data):
+    query.notify("<location>: " + data + " saved." + type(data))
+    # query.notify("<location> saved.")
 
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
