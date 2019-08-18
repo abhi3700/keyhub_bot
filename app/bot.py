@@ -43,7 +43,7 @@ def username_callback(query, chat, message):
 
 @bot.callback("location")
 def location_callback(query, chat, message, location):
-    loc = location
+    loc = message.location
     lat = loc.latitude
     lng = loc.longitude
     chat.send(str(lat) + " & " + str(lng))      # test
