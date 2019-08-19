@@ -1,0 +1,27 @@
+{
+    "abhi3701": {
+        "username": "abhi3701",
+        "location": {
+        		"lat": "9346238.432",
+        		"lng": "322314.34234"
+        },
+        "keycount": "2", // '2' as str bcoz Redis DB doesn't support INT 
+    },
+    "abhi3702": {
+        "username": "abhi3702",
+        "location": {
+        		"lat": "34463438.432",
+        		"lng": "4542314.34234"
+        },
+        "keycount": "4",
+    },
+    "abhi3703": {
+        "username": "abhi3703",
+        "location": {
+        		"lat": "43263438.432",
+        		"lng": "1212314.34234"
+        },
+        "keycount": "6",
+    }
+
+}
