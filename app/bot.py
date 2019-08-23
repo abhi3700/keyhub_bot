@@ -1,6 +1,7 @@
 import botogram
 import redis
 import os
+import requests
 from input import *
 
 
@@ -22,9 +23,24 @@ def requestkey_command(chat, message, args):
         chat.send("Okay! But I need some of your information. \nUse /sendinfo command.")
     """
     """Provides key based on user information"""
+    """User has to click a button for giving information - Username, Datetime, Location"""
+    btns = botogram.Buttons()
+    
+    btns[0].callback("Product A", "producta")     # button - Product A
+    btns[1].callback("Product B", "productb")     # button - Product B
+
+    chat.send("Okay! Select one of the products below -", attach= btns)
+
+# =======================================================Products===========================================================================
+@bot.callback("producta")
+def producta_callback(query, chat, message):
     chat.send("Okay! But I need some of your information. \nUse /sendinfo command.")
 
+@bot.callback("productb")
+def productb_callback(query, chat, message):
+    chat.send("Okay! But I need some of your information. \nUse /sendinfo command.")
 
+# ========================================================User Information==================================================================
 """
 TODO: Button popping from below
     - Username: when clicked, `username` saved in the database & show msg: "Username noted."
@@ -37,30 +53,51 @@ def sendinfo_command(chat, message, args):
     btns = botogram.Buttons()
     
     btns[0].callback("Username", "username")     # button - Username
-    btns[1].callback("Location", "location")     # button - Location
+    # btns[1].callback("Location", "location")     # button - Location
     
     chat.send("Please, select one of the buttons popping below.", attach= btns)
 
 # define empty dictionary for JSON object in Redis db
-d_username = {}
-
+# d_username = {}
+# =========================================================Parameters==============================================================
 @bot.callback("username")
 def username_callback(query, chat, message):
     user = query.sender
     username = user.username
+
     r.hmset(username, dict(username= username))
-    chat.send(r.hget(username, "username").decode('utf-8'))    # test 
-    query.notify("{username} saved.".format(username=r.hget(username, "username").decode('utf-8')))
+    msg_username = ""   # initialize
+    msg_username = r.hget(username, "username").decode('utf-8')
+    
+    query.notify("username: {username} saved.".format(username=msg_username))
+    # chat.send("{username} saved.".format(username=msg_username))
+    chat.send("Now, please share your location by clicking the BUTTON above")
 
 @bot.callback("location")
 def location_callback(query, chat, message):
-    # loc = message.location
-    # lat = loc.latitude
-    # lng = loc.longitude
-    # chat.send(str(lat) + " & " + str(lng))      # test
-    # query.notify("{latitude} & {longitude} saved.".format(latitude=str(lat), longitude=str(lng)))
-    query.notify("<location> saved.")
+    response = requests.get(geo_URL, verify= False)
+    response_json = response.json()     # type - 'dict'
+    msg_loc = ""       # initialize
+    if response.status_code == 200:
+        msg_loc = "Country: {country} saved.".format(country= response_json.get("country_name"))
+        # chat.send(msg_loc)
+        query.notify(msg_loc)
 
+        # Fetch 'product_key' from DB maintained with separate keys
+        chat.send("your key is <product_key>")
+    else:
+
+        chat.send("Connection ERROR!")
+    
+# ======================================================Key Usage Stats==========================================================
+@bot.command("keystatus")
+def keystatus_command(chat, message, args):
+    # phone_no = message.contact.phone_no
+    chat.send("The key usage stats for product A is <product_a>")
+    chat.send("The key usage stats for product B is <product_b>")
+
+
+    
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
     bot.run()

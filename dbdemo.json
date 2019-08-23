@@ -1,27 +1,57 @@
+// This database gets created in the beginning of the 
 {
-    "abhi3701": {
-        "username": "abhi3701",
-        "location": {
-        		"lat": "9346238.432",
-        		"lng": "322314.34234"
-        },
-        "keycount": "2", // '2' as str bcoz Redis DB doesn't support INT 
-    },
-    "abhi3702": {
-        "username": "abhi3702",
-        "location": {
-        		"lat": "34463438.432",
-        		"lng": "4542314.34234"
-        },
-        "keycount": "4",
-    },
-    "abhi3703": {
-        "username": "abhi3703",
-        "location": {
-        		"lat": "43263438.432",
-        		"lng": "1212314.34234"
-        },
-        "keycount": "6",
-    }
+	"phone_no1": {
+			"ProductA": {
+				"username": "abhi3701",
+				"country": "India",
+				// "location": {
+				// 	"lat": "9346238.432",
+		  //    		"lng": "322314.34234"
+				// },
+				"key_count": "2", // '2' as str bcoz Redis DB doesn't support INT     	  	
+				"datetime": "", // change datetime during key increment
+		  	},
+			"ProductB": {
+				"username": "abhi3701",
+				"country": "India",
+				// "location": {
+				// 	"lat": "9346238.432",
+				// 	"lng": "322314.34234"
+				// },
+				"key_count": "1"   	  	
+			}
+	},
+	"phone_no2": {
+		   "ProductA": {
+				"username": "abhi3702",
+				"country": "India",
+				// "location": {
+				// 	"lat": "34463438.432",
+				// 	"lng": "4542314.34234"
+				// },
+				"keycount": "4",
+			},
+			"ProductB": {
+				"username": "abhi3702",
+				"country": "India",
+				// "location": {
+				// 	"lat": "34463438.432",
+				// 	"lng": "4542314.34234"
+				// },
+				"keycount": "3",	     	
+		   } 
+	},
+	"phone_no3": {
+			"ProductA": {
+				"username": "abhi3703",
+				"country": "India",
+				// "location": {
+				// 	"lat": "43263438.432",
+				// 	"lng": "1212314.34234"
+				// },
+				"keycount": "6",
+		   },  
+			"ProductB": {
+	}
 
 }
