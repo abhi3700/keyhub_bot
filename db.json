@@ -1,67 +1,44 @@
 // This database gets created in the beginning of the 
 {
-	"product_keys": {
+	"phone_no1": {
 		"ProductA": {
-			"keys": [
-				"AllTestD3080H72ADB2ED217C2EF99FB",
-				"AllTestF3081HA85DE8EAAA7A6BACD26",
-				"AllTest63082HE1D47F4472BDDFB27CB",
-				"AllTest23083H35BF0368BFB9BF3D2D0"
-			],
-			"count": ""
-		},
+			"username": "abhi3701",
+			"country": "India",
+			// "location": {
+			// 	"lat": "9346238.432",
+	  		// 	"lng": "322314.34234"
+			// },
+			"key_count": "2", // '2' as str bcoz Redis DB doesn't support INT     	  	
+			"datetime": "", // change datetime during key access
+	  	},
 		"ProductB": {
-			"keys": [
-				"VIPTest42691H77783A5B46B05546C40",
-				"VIPTestE2692H8FE3EE5947AB4D252B1",
-				"VIPTestF2693H7AE16B684082B67E221",
-				"VIPTestF2694H3AF08CD44D9677BCFA2",
-				"VIPTest82695HDE5C9D3F43B0B2FBFE1"
-			],
-			"count": ""
+			"username": "abhi3701",
+			"country": "India",
+			"key_count": "1",
+			"datetime": "", // change datetime during key access
+
 		}
 	},
-	"users": {
-		"phone_no1": {
-			"ProductA": {
-				"username": "abhi3701",
-				"country": "India",
-				// "location": {
-				// 	"lat": "9346238.432",
-		  //    		"lng": "322314.34234"
-				// },
-				"key_count": "2", // '2' as str bcoz Redis DB doesn't support INT     	  	
-				"datetime": "", // change datetime during key access
-		  	},
-			"ProductB": {
-				"username": "abhi3701",
-				"country": "India",
-				"key_count": "1",
-				"datetime": "", // change datetime during key access
-
-			}
+	"phone_no2": {
+	   "ProductA": {
+			"username": "abhi3702",
+			"country": "India",
+			"keycount": "4",
+			"datetime": "", // change datetime during key access
 		},
-		"phone_no2": {
-		   "ProductA": {
-				"username": "abhi3702",
-				"country": "India",
-				"keycount": "4",
-				"datetime": "", // change datetime during key access
-			},
-			"ProductB": {
-				"username": "abhi3702",
-				"country": "India",
-				"keycount": "3",	     	
-				"datetime": "", // change datetime during key access
-		   } 
-		},
-		"phone_no3": {
-			"ProductA": {
-				"username": "abhi3703",
-				"country": "India",
-				"keycount": "6",
-				"datetime": "", // change datetime during key access
-		   },  
-		}
+		"ProductB": {
+			"username": "abhi3702",
+			"country": "India",
+			"keycount": "3",	     	
+			"datetime": "", // change datetime during key access
+	   } 
+	},
+	"phone_no3": {
+		"ProductA": {
+			"username": "abhi3703",
+			"country": "India",
+			"keycount": "6",
+			"datetime": "", // change datetime during key access
+	   },  
 	}
 }
