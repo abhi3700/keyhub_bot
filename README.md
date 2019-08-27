@@ -11,3 +11,6 @@ A key provider to End users based on their data
 		+ `location` - accessed from which location (i.e. country) during last time
 		+ `keycount` - no. of times keys accessed till date
 * #### Location:
+* #### Database:
+	- __Redis (NoSQL)__:
+	- __Excel (SQL)__: 

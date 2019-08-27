@@ -1,2 +1,5 @@
 botogram2
 redis
+pandas
+datetime
+json
