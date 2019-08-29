@@ -1,5 +1,6 @@
-botogram2
+botogram
 redis
-pandas
-datetime
+requests
 json
+pandas
+numpy

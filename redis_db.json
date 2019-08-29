@@ -9,15 +9,15 @@
 	  		// 	"lng": "322314.34234"
 			// },
 			"key": "",
-			"keycounttotal": "2", // '2' as str bcoz Redis DB doesn't support INT     	  	
-			"keycounttoday": "2", // '2' as str bcoz Redis DB doesn't support INT     	  	
+			// "keycounttotal": "2", // '2' as str bcoz Redis DB doesn't support INT     	  	
+			// "keycounttoday": "2", // '2' as str bcoz Redis DB doesn't support INT     	  	
 			"datetime": "", // change datetime during key access
 	  	},
 		"ProductB": {
 			"username": "abhi3701",
 			"country": "India",
-			"keycounttotal": "1",
-			"keycounttoday": "1",
+			// "keycounttotal": "1",
+			// "keycounttoday": "1",
 			"datetime": "", // change datetime during key access
 
 		}
@@ -27,16 +27,16 @@
 			"username": "abhi3702",
 			"country": "India",
 			"key": "",
-			"keycounttotal": "4",
-			"keycounttoday": "4",
+			// "keycounttotal": "4",
+			// "keycounttoday": "4",
 			"datetime": "", // change datetime during key access
 		},
 		"ProductB": {
 			"username": "abhi3702",
 			"country": "India",
 			"key": "",
-			"keycounttotal": "3",	     	
-			"keycounttoday": "3",	     	
+			// "keycounttotal": "3",	     	
+			// "keycounttoday": "3",	     	
 			"datetime": "", // change datetime during key access
 	   } 
 	},
@@ -45,8 +45,8 @@
 			"username": "abhi3703",
 			"country": "India",
 			"key": "",
-			"keycounttotal": "6",
-			"keycounttoday": "6",
+			// "keycounttotal": "6",
+			// "keycounttoday": "6",
 			"datetime": "", // change datetime during key access
 	   },  
 	}

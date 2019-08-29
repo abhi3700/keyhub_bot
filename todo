@@ -1,4 +1,6 @@
-- push keys from Excel to DB using `db.py`
-- store location in DB using `bot.py`
+- Today
+  - check for phone no. reading
+  - check for the database storing in redis DB & excel DB
+
 - check if a user from a channel using `bot.py`
  
