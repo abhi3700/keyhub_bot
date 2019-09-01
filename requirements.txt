@@ -1,4 +1,4 @@
-botogram
+botogram2
 redis
 requests
 json
