@@ -1,4 +1,4 @@
-botogram2
+botogram2==0.6
 redis
 requests
 json
