@@ -1,6 +1,5 @@
 botogram2
 redis
 requests
-json
 pandas
 numpy
