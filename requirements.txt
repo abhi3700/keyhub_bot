@@ -3,3 +3,5 @@ redis
 requests
 pandas
 numpy
+d6tstack
+sqlalchemy
