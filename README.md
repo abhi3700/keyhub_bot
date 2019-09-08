@@ -1,6 +1,17 @@
 # keyhubbot
 A key provider to End users based on their data
 
+## Python Packages
+* `botogram2`
+* `redis`
+* `requests`
+* `pandas`
+* `numpy`
+* `sqlalchemy`
+
+> NOTE: for uploading a package u need an additional pkg: `d6tstack` 
+
+
 ## Modules
 ### Phase-1
 * #### Commands:
@@ -17,7 +28,7 @@ A key provider to End users based on their data
 	- __Redis (NoSQL)__:
 		+ This database is for viewing the info.s corresponding to a user (with phone no.)
 		+ store latest used product keys, key_count_total, key_count_today,
-	- __Excel (SQL)__:
+	- __PostgreSQL (SQL)__:
 		+ This database is for viewing the info.s corresponding to a product key.
 		+ This is also for ease of use by the end product manager. They can view the product keys with user details filled correspondingly.
 
