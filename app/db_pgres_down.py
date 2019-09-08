@@ -3,7 +3,6 @@ Download the SQL table as dataframe
 write the dataframe to CSV
 """
 import pandas as pd
-import d6tstack.utils as du
 import sqlalchemy
 from input import *
 
