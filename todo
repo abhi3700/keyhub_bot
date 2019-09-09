@@ -1,3 +1,4 @@
+- solve `db_postgres.py` to store the CSV to SQL
 - Today
   - check for phone no. reading
   - check for the database storing in redis DB & excel DB
