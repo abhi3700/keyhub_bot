@@ -1,5 +1,5 @@
 # Take it from creating Bot API token in BotFather's chat
-API_key = "979871020:AAGWLY7hTPuKH1EiNqD592AzHS01nhU-RBI"
+API_key = "979871020:AAEDYNWPOm6y3BJaO5u1ojbvtSsYnim2kJM"
 
 # Capture using `$ heroku config | grep REDIS` from the terminal at App's root dir
 REDIS_URL = "redis://h:pd4a2fa90f5a63058400930ffd21f5864312b2a174061846e13543a79eb1fdd81@ec2-54-77-8-133.eu-west-1.compute.amazonaws.com:18179"
