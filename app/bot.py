@@ -9,8 +9,6 @@ import sqlalchemy
 import d6tstack.utils as du
 from input import *
 
-# -------------------------------------------------------'phone' global var------------------------------------------------------------------------
-phone_global = ""      # replace with "" string in production release
 
 # -------------------------------------------------------About Bot--------------------------------------------------------------------
 bot = botogram.create(API_key)
@@ -60,9 +58,20 @@ def button_messages_are_like_normal_messages(chat, message):
     # elif message.location:
     #     chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
     if message.contact:
-        # TODO: store/update `phone` in Redis database
-        phone_global = message.contact.phone_number
-        chat.send('You choose to send your contact: %s' % phone_global)
+        phoneno = message.contact.phone_number
+
+        # Create a node - `phone` and store `username` in REDIS DB. This is bcoz in botogram, can't set global_variable.
+        r.hset(phoneno, "phoneno", json.dumps(dict(username= message.sender.username)))
+
+        # find the root phoneno. if username is available in REDIS DB
+        key_phone = ""
+        for k in r.keys():
+            # print(k.decode('utf-8'))
+            dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "phoneno"))
+            if dict_nested2_val2['username'] == message.sender.username:
+                key_phone = k.decode('utf-8')
+
+        chat.send('You choose to send your contact no.: {phone}'.format(phone= key_phone))
         chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
 
     chat.send('Press /removekeyboard to remove the annoying keyboard')
@@ -82,12 +91,19 @@ def removekeyboard_command(chat, message):
         })
     })
 
-# ==============================================================Request key=============================================================
+# ==============================================================Request key COMMAND=============================================================
 @bot.command("requestkey")
 def requestkey_command(chat, message, args):
     """request the key for different products"""
     # TODO: call `phone` from Redis database
-    if phone_global != "":
+    key_phone = ""
+    for k in r.keys():
+        # print(k.decode('utf-8'))
+        dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "phoneno"))
+        if dict_nested2_val2['username'] == message.sender.username:
+            key_phone = k.decode('utf-8')
+
+    if key_phone != "":
         """
         TODO: Check if the user is/not in a channel
         If(message.sender.group != group_name):
@@ -97,21 +113,29 @@ def requestkey_command(chat, message, args):
         """
         btns = botogram.Buttons()
         
-        btns[0].callback("Product A", "producta")     # button - Product A
-        btns[1].callback("Product B", "productb")     # button - Product B
-        btns[2].callback("Product C", "productc")     # button - Product C
-        btns[3].callback("Product D", "productd")     # button - Product D
-        btns[4].callback("Product E", "producte")     # button - Product E
+        btns[0].callback("A", "producta")     # button - Product A
+        btns[0].callback("B", "productb")     # button - Product B
+        btns[0].callback("C", "productc")     # button - Product C
+        btns[0].callback("D", "productd")     # button - Product D
+        btns[0].callback("E", "producte")     # button - Product E
 
         chat.send("Okay! Select one of the products below -", attach= btns)
     else:
         chat.send("Please, share the phone no. first via /sharephone")
-        chat.send("phone no. is: {phone}".format(phone= phone_global))  # for DEBUG
+        # chat.send("phone no. is: {phone}".format(phone= key_phone))  # for DEBUG
 
-# # ----------------------------------------------------------------Products------------------------------------------------------------------
+# ----------------------------------------------------------------Product buttons CALLBACK------------------------------------------------------------------
+"""
+    Here, we could have used `notify_callback` but the data has to be withing 32 characters (ASCII).
+    So, used separate callbacks for each product.
+
+@bot.callback("notify")
+def notify_callback(query, data, chat, message):
+    query.notify(data)
+"""
 @bot.callback("producta")
 def producta_callback(query, chat, message):
-    chat.send("Now, please share your details --> [username, location] via /sendinfoa command.")
+    chat.send("Now, please share your details --> [username, location] via /shareinfoa command.")
 
 @bot.callback("productb")
 def productb_callback(query, chat, message):
@@ -129,81 +153,91 @@ def productd_callback(query, chat, message):
 def producte_callback(query, chat, message):
     chat.send("Now, please share your details --> [username, location] via /sendinfoe command.")
 
-# ========================================================User Information for Product A==================================================================
-@bot.command("sendinfoa")
-def sendinfoa_command(chat, message, args):
-    """User has to click a 'Info.' button for giving information"""
-    btns = botogram.Buttons()
+# # ========================================================User Information for Product A==================================================================
+# @bot.command("sendinfoa")
+# def sendinfoa_command(chat, message, args):
+#     """User has to click a 'Info.' button for giving information"""
+#     btns = botogram.Buttons()
     
-    btns[0].callback("Info.", "shareinfoa")     # button - Username
-    # btns[1].callback("Location", "locationa")     # button - Location
+#     btns[0].callback("Info.", "shareinfoa")     # button - Username
+#     # btns[1].callback("Location", "locationa")     # button - Location
     
-    chat.send("Please, click on the button below", attach= btns)
+#     chat.send("Please, click on the button below", attach= btns)
 
 
-# ========================================================User Information for Product B==================================================================
-@bot.command("sendinfob")
-def sendinfob_command(chat, message, args):
-    """User has to click a 'Info.' button for giving information"""
-    btns = botogram.Buttons()
+# # ========================================================User Information for Product B==================================================================
+# @bot.command("sendinfob")
+# def sendinfob_command(chat, message, args):
+#     """User has to click a 'Info.' button for giving information"""
+#     btns = botogram.Buttons()
     
-    btns[0].callback("Info.", "shareinfob")     # button - Username
-    # btns[1].callback("Location", "locationa")     # button - Location
+#     btns[0].callback("Info.", "shareinfob")     # button - Username
+#     # btns[1].callback("Location", "locationa")     # button - Location
     
-    chat.send("Please, click on the button below", attach= btns)
+#     chat.send("Please, click on the button below", attach= btns)
 
-# ========================================================User Information for Product C==================================================================
-@bot.command("sendinfoc")
-def sendinfoc_command(chat, message, args):
-    """User has to click a 'Info.' button for giving information"""
-    btns = botogram.Buttons()
+# # ========================================================User Information for Product C==================================================================
+# @bot.command("sendinfoc")
+# def sendinfoc_command(chat, message, args):
+#     """User has to click a 'Info.' button for giving information"""
+#     btns = botogram.Buttons()
     
-    btns[0].callback("Info.", "shareinfoc")     # button - Username
-    # btns[1].callback("Location", "locationa")     # button - Location
+#     btns[0].callback("Info.", "shareinfoc")     # button - Username
+#     # btns[1].callback("Location", "locationa")     # button - Location
     
-    chat.send("Please, click on the button below", attach= btns)
+#     chat.send("Please, click on the button below", attach= btns)
 
-# ========================================================User Information for Product D==================================================================
-@bot.command("sendinfod")
-def sendinfod_command(chat, message, args):
-    """User has to click a 'Info.' button for giving information"""
-    btns = botogram.Buttons()
+# # ========================================================User Information for Product D==================================================================
+# @bot.command("sendinfod")
+# def sendinfod_command(chat, message, args):
+#     """User has to click a 'Info.' button for giving information"""
+#     btns = botogram.Buttons()
     
-    btns[0].callback("Info.", "shareinfod")     # button - Username
-    # btns[1].callback("Location", "locationa")     # button - Location
+#     btns[0].callback("Info.", "shareinfod")     # button - Username
+#     # btns[1].callback("Location", "locationa")     # button - Location
     
-    chat.send("Please, click on the button below", attach= btns)
+#     chat.send("Please, click on the button below", attach= btns)
 
-# ========================================================User Information for Product E==================================================================
-@bot.command("sendinfoe")
-def sendinfoe_command(chat, message, args):
-    """User has to click a 'Info.' button for giving information"""
-    btns = botogram.Buttons()
+# # ========================================================User Information for Product E==================================================================
+# @bot.command("sendinfoe")
+# def sendinfoe_command(chat, message, args):
+#     """User has to click a 'Info.' button for giving information"""
+#     btns = botogram.Buttons()
     
-    btns[0].callback("Info.", "shareinfoe")     # button - Username
-    # btns[1].callback("Location", "locationa")     # button - Location
+#     btns[0].callback("Info.", "shareinfoe")     # button - Username
+#     # btns[1].callback("Location", "locationa")     # button - Location
     
-    chat.send("Please, click on the button below", attach= btns)
+#     chat.send("Please, click on the button below", attach= btns)
 
-# =========================================================User Infos==============================================================
-@bot.callback("shareinfoa")
-def shareinfoa_callback(query, chat, message):
-    user = query.sender
-    uname = user.username
+# =========================================================User Information for Product A==============================================================
+@bot.command("shareinfoa")
+def shareinfoa_command(chat, message, args):
+    """User has to share information: """
+    
+    uname = message.sender.username
+
+    # find the root phoneno. if username is available in REDIS DB
+    key_phone = ""
+    for k in r.keys():
+        # print(k.decode('utf-8'))
+        dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "phoneno"))
+        if dict_nested2_val2['username'] == message.sender.username:
+            key_phone = k.decode('utf-8')
 
     response = requests.get(geo_URL, verify= False)
     response_json = response.json()     # type - 'dict'
 
-    if phone_global != "":
+    if key_phone != "":
         if response.status_code == 200:
             country_name = response_json.get("country_name")
 
-            r.hset(phone_global, "ProductA", json.dumps(dict(username= uname)))
-            r.hset(phone_global, "ProductA", json.dumps(dict(country= country_name)))
+            r.hset(key_phone, "product_a", json.dumps(dict(username= uname)))
+            r.hset(key_phone, "product_a", json.dumps(dict(country= country_name)))
 
-            query.notify("country: {country} saved.".format(country= json.loads(r.hget(phone_global, "ProductA").decode('utf-8')).get("country")))
+            chat.send("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "product_a").decode('utf-8')).get("country")))
 
             # Read the SQL table
+            chat.send("Reading the SQL database. Please wait...")
             df_sql_a = pd.read_sql_table('product_a', sqlengine)
 
             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
@@ -213,298 +247,301 @@ def shareinfoa_callback(query, chat, message):
             chat.send("your key is \n{productkey}".format(productkey= key))
 
             # Now, note the key, datetime in Redis DB
-            r.hset(phone_global, "ProductA", json.dumps(dict(key= key)))
-            r.hset(phone_global, "ProductA", json.dumps(dict(datetime= datetime.date.today())))
+            r.hset(key_phone, "product_a", json.dumps(dict(key= key)))
+            r.hset(key_phone, "product_a", json.dumps(dict(datetime= str(datetime.date.today()))))
 
             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
+            chat.send("replacing [country, username, phone] in the dataframe- `df_nan`. Please wait....")
             df_nan.at[ind, 'country'] = country_name
-            df_nan.at[ind, 'username'] = json.loads(r.hget(phone_global, "ProductA").decode('utf-8')).get("username")
-            df_nan.at[ind, 'phone'] = phone_global
+            df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "product_a").decode('utf-8')).get("username")
+            df_nan.at[ind, 'phone'] = key_phone
 
             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
             df_sql_a.loc[ind] = df_nan.loc[ind]
 
             # write the modified dataframe to PostgreSQL table
+            chat.send("Uploading modified dataframe to the SQL database. Please wait....")
             du.pd_to_psql(df_sql_a, cfg_uri_psql, 'product_a', if_exists='replace')
             chat.send("user details saved in PostgreSQL")   # for DEBUG
-
-        else:
-            chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
-    else:
-        chat.send("Please, share the phone no. first\n")
-
-@bot.callback("shareinfob")
-def shareinfob_callback(query, chat, message):
-    user = query.sender
-    uname = user.username
-
-    response = requests.get(geo_URL, verify= False)
-    response_json = response.json()     # type - 'dict'
-
-    if phone_global != "":
-        if response.status_code == 200:
-            country_name = response_json.get("country_name")
-
-            r.hset(phone_global, "ProductB", json.dumps(dict(username= uname)))
-            r.hset(phone_global, "ProductB", json.dumps(dict(country= country_name)))
-
-            query.notify("country: {country} saved.".format(country= json.loads(r.hget(phone_global, "ProductB").decode('utf-8')).get("country")))
-
-            # Read the SQL table
-            df_sql_b = pd.read_sql_table('product_b', sqlengine)
-
-            # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-            df_nan = df_sql_b[(df_sql_b['country'].isnull()) & (df_sql_b['username'].isnull()) & (df_sql_b['phone'].isnull())]
-            ind = df_nan.index.tolist()[0]
-            key = df_nan.loc[ind, 'keys']
-            chat.send("your key is \n{productkey}".format(productkey= key))
-
-            # Now, note the key, datetime in Redis DB
-            r.hset(phone_global, "ProductB", json.dumps(dict(key= key)))
-            r.hset(phone_global, "ProductB", json.dumps(dict(datetime= datetime.date.today())))
-            
-            # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-            df_nan.at[ind, 'country'] = country_name
-            df_nan.at[ind, 'username'] = json.loads(r.hget(phone_global, "ProductB").decode('utf-8')).get("username")
-            df_nan.at[ind, 'phone'] = phone_global
-
-            # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-            df_sql_b.loc[ind] = df_nan.loc[ind]
-
-            # write the modified dataframe to PostgreSQL table
-            du.pd_to_psql(df_sql_b, cfg_uri_psql, 'product_b', if_exists='replace')
+            chat.send("DONE!")
 
         else:
             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
     else:
         chat.send("Please, share the phone no. first via /sharephone")
 
-@bot.callback("shareinfoc")
-def shareinfoc_callback(query, chat, message):
-    user = query.sender
-    uname = user.username
+# @bot.callback("shareinfob")
+# def shareinfob_callback(query, chat, message):
+#     user = query.sender
+#     uname = user.username
 
-    response = requests.get(geo_URL, verify= False)
-    response_json = response.json()     # type - 'dict'
+#     response = requests.get(geo_URL, verify= False)
+#     response_json = response.json()     # type - 'dict'
 
-    if phone_global != "":
-        if response.status_code == 200:
-            country_name = response_json.get("country_name")
+#     if key_phone != "":
+#         if response.status_code == 200:
+#             country_name = response_json.get("country_name")
 
-            r.hset(phone_global, "ProductC", json.dumps(dict(username= uname)))
-            r.hset(phone_global, "ProductC", json.dumps(dict(country= country_name)))
+#             r.hset(key_phone, "ProductB", json.dumps(dict(username= uname)))
+#             r.hset(key_phone, "ProductB", json.dumps(dict(country= country_name)))
 
-            query.notify("country: {country} saved.".format(country= json.loads(r.hget(phone_global, "ProductC").decode('utf-8')).get("country")))
+#             query.notify("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "ProductB").decode('utf-8')).get("country")))
 
-            # Read the SQL table
-            df_sql_c = pd.read_sql_table('product_c', sqlengine)
+#             # Read the SQL table
+#             df_sql_b = pd.read_sql_table('product_b', sqlengine)
 
-            # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-            df_nan = df_sql_c[(df_sql_c['country'].isnull()) & (df_sql_c['username'].isnull()) & (df_sql_c['phone'].isnull())]
-            ind = df_nan.index.tolist()[0]
-            key = df_nan.loc[ind, 'keys']
-            chat.send("your key is \n{productkey}".format(productkey= key))
+#             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
+#             df_nan = df_sql_b[(df_sql_b['country'].isnull()) & (df_sql_b['username'].isnull()) & (df_sql_b['phone'].isnull())]
+#             ind = df_nan.index.tolist()[0]
+#             key = df_nan.loc[ind, 'keys']
+#             chat.send("your key is \n{productkey}".format(productkey= key))
 
-            # Now, note the key, datetime in Redis DB
-            r.hset(phone_global, "ProductC", json.dumps(dict(key= key)))
-            r.hset(phone_global, "ProductC", json.dumps(dict(datetime= datetime.date.today())))
+#             # Now, note the key, datetime in Redis DB
+#             r.hset(key_phone, "ProductB", json.dumps(dict(key= key)))
+#             r.hset(key_phone, "ProductB", json.dumps(dict(datetime= datetime.date.today())))
             
-            # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-            df_nan.at[ind, 'country'] = country_name
-            df_nan.at[ind, 'username'] = json.loads(r.hget(phone_global, "ProductC").decode('utf-8')).get("username")
-            df_nan.at[ind, 'phone'] = phone_global
+#             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
+#             df_nan.at[ind, 'country'] = country_name
+#             df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "ProductB").decode('utf-8')).get("username")
+#             df_nan.at[ind, 'phone'] = key_phone
 
-            # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-            df_sql_c.loc[ind] = df_nan.loc[ind]
+#             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
+#             df_sql_b.loc[ind] = df_nan.loc[ind]
 
-            # write the modified dataframe to PostgreSQL table
-            du.pd_to_psql(df_sql_c, cfg_uri_psql, 'product_c', if_exists='replace')
+#             # write the modified dataframe to PostgreSQL table
+#             du.pd_to_psql(df_sql_b, cfg_uri_psql, 'product_b', if_exists='replace')
 
-        else:
-            chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
-    else:
-        chat.send("Please, share the phone no. first via /sharephone")
+#         else:
+#             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
+#     else:
+#         chat.send("Please, share the phone no. first via /sharephone")
 
-@bot.callback("shareinfod")
-def shareinfod_callback(query, chat, message):
-    user = query.sender
-    uname = user.username
+# @bot.callback("shareinfoc")
+# def shareinfoc_callback(query, chat, message):
+#     user = query.sender
+#     uname = user.username
 
-    response = requests.get(geo_URL, verify= False)
-    response_json = response.json()     # type - 'dict'
+#     response = requests.get(geo_URL, verify= False)
+#     response_json = response.json()     # type - 'dict'
 
-    if phone_global != "":
-        if response.status_code == 200:
-            country_name = response_json.get("country_name")
-            r.hset(phone_global, "ProductD", json.dumps(dict(username= uname)))
-            r.hset(phone_global, "ProductD", json.dumps(dict(country= country_name)))
+#     if key_phone != "":
+#         if response.status_code == 200:
+#             country_name = response_json.get("country_name")
 
-            query.notify("country: {country} saved.".format(country= json.loads(r.hget(phone_global, "ProductD").decode('utf-8')).get("country")))
+#             r.hset(key_phone, "ProductC", json.dumps(dict(username= uname)))
+#             r.hset(key_phone, "ProductC", json.dumps(dict(country= country_name)))
 
-            # Read the SQL table
-            df_sql_d = pd.read_sql_table('product_d', sqlengine)
+#             query.notify("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "ProductC").decode('utf-8')).get("country")))
 
-            # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-            df_nan = df_d[(df_d['country'].isnull()) & (df_d['username'].isnull()) & (df_d['phone'].isnull())]
-            ind = df_nan.index.tolist()[0]
-            key = df_nan.loc[ind, 'keys']
-            chat.send("your key is \n{productkey}".format(productkey= key))
+#             # Read the SQL table
+#             df_sql_c = pd.read_sql_table('product_c', sqlengine)
 
-            # Now, note the key, datetime in Redis DB
-            r.hset(phone_global, "ProductD", json.dumps(dict(key= key)))
-            r.hset(phone_global, "ProductD", json.dumps(dict(datetime= datetime.date.today())))
+#             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
+#             df_nan = df_sql_c[(df_sql_c['country'].isnull()) & (df_sql_c['username'].isnull()) & (df_sql_c['phone'].isnull())]
+#             ind = df_nan.index.tolist()[0]
+#             key = df_nan.loc[ind, 'keys']
+#             chat.send("your key is \n{productkey}".format(productkey= key))
+
+#             # Now, note the key, datetime in Redis DB
+#             r.hset(key_phone, "ProductC", json.dumps(dict(key= key)))
+#             r.hset(key_phone, "ProductC", json.dumps(dict(datetime= datetime.date.today())))
             
-            # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-            df_nan.at[ind, 'country'] = country_name
-            df_nan.at[ind, 'username'] = json.loads(r.hget(phone_global, "ProductD").decode('utf-8')).get("username")
-            df_nan.at[ind, 'phone'] = phone_global
+#             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
+#             df_nan.at[ind, 'country'] = country_name
+#             df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "ProductC").decode('utf-8')).get("username")
+#             df_nan.at[ind, 'phone'] = key_phone
 
-            # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-            df_d.loc[ind] = df_nan.loc[ind]
+#             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
+#             df_sql_c.loc[ind] = df_nan.loc[ind]
 
-            # write the modified dataframe to PostgreSQL table
-            du.pd_to_psql(df_sql_d, cfg_uri_psql, 'product_d', if_exists='replace')
+#             # write the modified dataframe to PostgreSQL table
+#             du.pd_to_psql(df_sql_c, cfg_uri_psql, 'product_c', if_exists='replace')
 
-        else:
-            chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
-    else:
-        chat.send("Please, share the phone no. first via /sharephone")
+#         else:
+#             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
+#     else:
+#         chat.send("Please, share the phone no. first via /sharephone")
 
-@bot.callback("shareinfoe")
-def shareinfoe_callback(query, chat, message):
-    user = query.sender
-    uname = user.username
+# @bot.callback("shareinfod")
+# def shareinfod_callback(query, chat, message):
+#     user = query.sender
+#     uname = user.username
 
-    response = requests.get(geo_URL, verify= False)
-    response_json = response.json()     # type - 'dict'
+#     response = requests.get(geo_URL, verify= False)
+#     response_json = response.json()     # type - 'dict'
 
-    if phone_global != "":
-        if response.status_code == 200:
-            country_name = response_json.get("country_name")
+#     if key_phone != "":
+#         if response.status_code == 200:
+#             country_name = response_json.get("country_name")
+#             r.hset(key_phone, "ProductD", json.dumps(dict(username= uname)))
+#             r.hset(key_phone, "ProductD", json.dumps(dict(country= country_name)))
 
-            r.hset(phone_global, "ProductE", json.dumps(dict(username= uname)))
-            r.hset(phone_global, "ProductE", json.dumps(dict(country= country_name)))
+#             query.notify("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "ProductD").decode('utf-8')).get("country")))
 
-            query.notify("country: {country} saved.".format(country= json.loads(r.hget(phone_global, "ProductE").decode('utf-8')).get("country")))
+#             # Read the SQL table
+#             df_sql_d = pd.read_sql_table('product_d', sqlengine)
 
-            # Read the SQL table
-            df_sql_e = pd.read_sql_table('product_e', sqlengine)
+#             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
+#             df_nan = df_d[(df_d['country'].isnull()) & (df_d['username'].isnull()) & (df_d['phone'].isnull())]
+#             ind = df_nan.index.tolist()[0]
+#             key = df_nan.loc[ind, 'keys']
+#             chat.send("your key is \n{productkey}".format(productkey= key))
 
-            # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-            df_nan = df_sql_e[(df_sql_e['country'].isnull()) & (df_sql_e['username'].isnull()) & (df_sql_e['phone'].isnull())]
-            ind = df_nan.index.tolist()[0]
-            key = df_nan.loc[ind, 'keys']
-            chat.send("your key is \n{productkey}".format(productkey= key))
-
-            # Now, note the key, datetime in Redis DB
-            r.hset(phone_global, "ProductE", json.dumps(dict(key= key)))
-            r.hset(phone_global, "ProductE", json.dumps(dict(datetime= datetime.date.today())))
+#             # Now, note the key, datetime in Redis DB
+#             r.hset(key_phone, "ProductD", json.dumps(dict(key= key)))
+#             r.hset(key_phone, "ProductD", json.dumps(dict(datetime= datetime.date.today())))
             
-            # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-            df_nan.at[ind, 'country'] = country_name
-            df_nan.at[ind, 'username'] = json.loads(r.hget(phone_global, "ProductE").decode('utf-8')).get("username")
-            df_nan.at[ind, 'phone'] = phone_global
+#             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
+#             df_nan.at[ind, 'country'] = country_name
+#             df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "ProductD").decode('utf-8')).get("username")
+#             df_nan.at[ind, 'phone'] = key_phone
 
-            # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-            df_sql_e.loc[ind] = df_nan.loc[ind]
+#             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
+#             df_d.loc[ind] = df_nan.loc[ind]
 
-            # write the modified dataframe to PostgreSQL table
-            du.pd_to_psql(df_sql_e, cfg_uri_psql, 'product_', if_exists='replace')
+#             # write the modified dataframe to PostgreSQL table
+#             du.pd_to_psql(df_sql_d, cfg_uri_psql, 'product_d', if_exists='replace')
 
-        else:
-            chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
-    else:
-        chat.send("Please, share the phone no. first via /sharephone")
+#         else:
+#             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
+#     else:
+#         chat.send("Please, share the phone no. first via /sharephone")
+
+# @bot.callback("shareinfoe")
+# def shareinfoe_callback(query, chat, message):
+#     user = query.sender
+#     uname = user.username
+
+#     response = requests.get(geo_URL, verify= False)
+#     response_json = response.json()     # type - 'dict'
+
+#     if key_phone != "":
+#         if response.status_code == 200:
+#             country_name = response_json.get("country_name")
+
+#             r.hset(key_phone, "ProductE", json.dumps(dict(username= uname)))
+#             r.hset(key_phone, "ProductE", json.dumps(dict(country= country_name)))
+
+#             query.notify("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "ProductE").decode('utf-8')).get("country")))
+
+#             # Read the SQL table
+#             df_sql_e = pd.read_sql_table('product_e', sqlengine)
+
+#             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
+#             df_nan = df_sql_e[(df_sql_e['country'].isnull()) & (df_sql_e['username'].isnull()) & (df_sql_e['phone'].isnull())]
+#             ind = df_nan.index.tolist()[0]
+#             key = df_nan.loc[ind, 'keys']
+#             chat.send("your key is \n{productkey}".format(productkey= key))
+
+#             # Now, note the key, datetime in Redis DB
+#             r.hset(key_phone, "ProductE", json.dumps(dict(key= key)))
+#             r.hset(key_phone, "ProductE", json.dumps(dict(datetime= datetime.date.today())))
+            
+#             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
+#             df_nan.at[ind, 'country'] = country_name
+#             df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "ProductE").decode('utf-8')).get("username")
+#             df_nan.at[ind, 'phone'] = key_phone
+
+#             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
+#             df_sql_e.loc[ind] = df_nan.loc[ind]
+
+#             # write the modified dataframe to PostgreSQL table
+#             du.pd_to_psql(df_sql_e, cfg_uri_psql, 'product_', if_exists='replace')
+
+#         else:
+#             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
+#     else:
+#         chat.send("Please, share the phone no. first via /sharephone")
 # ======================================================Key Usage Stats==========================================================
-@bot.command("keystatsa")
-def keystatsa_command(chat, message, args):
-    """shows the key stats of 'Product A'"""
-    """
-    TODO:
-        Fetch the stats from Excel database 
-    """
-    uname = message.sender.username
+# @bot.command("keystatsa")
+# def keystatsa_command(chat, message, args):
+#     """shows the key stats of 'Product A'"""
+#     """
+#     TODO:
+#         Fetch the stats from Excel database 
+#     """
+#     uname = message.sender.username
 
-    df_search = df_sql_a.loc[df_sql_a['username'].isin([uname])]
+#     df_search = df_sql_a.loc[df_sql_a['username'].isin([uname])]
 
-    if len(df_search) != 0:
-        chat.send("The keys accessed so far:")
-        for k in range(len(df_search)):
-            chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
-    else:
-        chat.send("No product keys accessed.")
+#     if len(df_search) != 0:
+#         chat.send("The keys accessed so far:")
+#         for k in range(len(df_search)):
+#             chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
+#     else:
+#         chat.send("No product keys accessed.")
 
-@bot.command("keystatsb")
-def keystatsb_command(chat, message, args):
-    """shows the key stats of 'Product B'"""
-    """
-    TODO:
-        Fetch the stats from Excel database 
-    """
-    uname = message.sender.username
+# @bot.command("keystatsb")
+# def keystatsb_command(chat, message, args):
+#     """shows the key stats of 'Product B'"""
+#     """
+#     TODO:
+#         Fetch the stats from Excel database 
+#     """
+#     uname = message.sender.username
 
-    df_search = df_sql_b.loc[df_sql_b['username'].isin([uname])]
+#     df_search = df_sql_b.loc[df_sql_b['username'].isin([uname])]
 
-    if len(df_search) != 0:
-        chat.send("The keys accessed so far:")
-        for k in range(len(df_search)):
-            chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
-    else:
-        chat.send("No product keys accessed.")
+#     if len(df_search) != 0:
+#         chat.send("The keys accessed so far:")
+#         for k in range(len(df_search)):
+#             chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
+#     else:
+#         chat.send("No product keys accessed.")
 
-@bot.command("keystatsc")
-def keystatsc_command(chat, message, args):
-    """shows the key stats of 'Product C'"""
-    """
-    TODO:
-        Fetch the stats from Excel database 
-    """
-    uname = message.sender.username
+# @bot.command("keystatsc")
+# def keystatsc_command(chat, message, args):
+#     """shows the key stats of 'Product C'"""
+#     """
+#     TODO:
+#         Fetch the stats from Excel database 
+#     """
+#     uname = message.sender.username
 
-    df_search = df_sql_c.loc[df_sql_c['username'].isin([uname])]
+#     df_search = df_sql_c.loc[df_sql_c['username'].isin([uname])]
 
-    if len(df_search) != 0:
-        chat.send("The keys accessed so far:")
-        for k in range(len(df_search)):
-            chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
-    else:
-        chat.send("No product keys accessed.")
+#     if len(df_search) != 0:
+#         chat.send("The keys accessed so far:")
+#         for k in range(len(df_search)):
+#             chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
+#     else:
+#         chat.send("No product keys accessed.")
 
-@bot.command("keystatsd")
-def keystatsd_command(chat, message, args):
-    """shows the key stats of 'Product D'"""
-    """
-    TODO:
-        Fetch the stats from Excel database 
-    """
-    uname = message.sender.username
+# @bot.command("keystatsd")
+# def keystatsd_command(chat, message, args):
+#     """shows the key stats of 'Product D'"""
+#     """
+#     TODO:
+#         Fetch the stats from Excel database 
+#     """
+#     uname = message.sender.username
 
-    df_search = df_d.loc[df_d['username'].isin([uname])]
+#     df_search = df_d.loc[df_d['username'].isin([uname])]
 
-    if len(df_search) != 0:
-        chat.send("The keys accessed so far:")
-        for k in range(len(df_search)):
-            chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
-    else:
-        chat.send("No product keys accessed.")
+#     if len(df_search) != 0:
+#         chat.send("The keys accessed so far:")
+#         for k in range(len(df_search)):
+#             chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
+#     else:
+#         chat.send("No product keys accessed.")
 
-@bot.command("keystatse")
-def keystatse_command(chat, message, args):
-    """shows the key stats of 'Product E'"""
-    """
-    TODO:
-        Fetch the stats from Excel database 
-    """
-    uname = message.sender.username
+# @bot.command("keystatse")
+# def keystatse_command(chat, message, args):
+#     """shows the key stats of 'Product E'"""
+#     """
+#     TODO:
+#         Fetch the stats from Excel database 
+#     """
+#     uname = message.sender.username
 
-    df_search = df_sql_e.loc[df_sql_e['username'].isin([uname])]
+#     df_search = df_sql_e.loc[df_sql_e['username'].isin([uname])]
 
-    if len(df_search) != 0:
-        chat.send("The keys accessed so far:")
-        for k in range(len(df_search)):
-            chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
-    else:
-        chat.send("No product keys accessed.")
+#     if len(df_search) != 0:
+#         chat.send("The keys accessed so far:")
+#         for k in range(len(df_search)):
+#             chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
+#     else:
+#         chat.send("No product keys accessed.")
     
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
