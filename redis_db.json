@@ -1,6 +1,9 @@
 // This database gets created in the REDIS database
 {
 	"+918145634656": {
+        "phoneno": {        // this is to store the phoneno & username during contact share.
+            "username": "abhi3701"
+        },
         "product_a": {
             "username": "abhi3701",
             "country": "India",
@@ -19,6 +22,9 @@
 	},
 	// ---------------------------------------------------------------------------------------------
 	"+15417543010": {
+        "phoneno": {        // this is to store the phoneno & username during contact share.
+            "username": "abhi3701"
+        },
         "product_a": {
             "username": "scl4623",
             "country": "US",
