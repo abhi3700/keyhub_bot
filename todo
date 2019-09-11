@@ -1,7 +1,3 @@
-- solve `db_postgres.py` to store the CSV to SQL
-- Today
-  - check for phone no. reading
-  - check for the database storing in redis DB & excel DB
-
+- apply the same (i.e. A) for all other products - B, C, D, E
+- check stats for all products corresponding to a user
 - check if a user from a channel using `bot.py`
- 
