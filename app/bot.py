@@ -253,7 +253,7 @@ def shareinfoa_command(chat, message, args):
             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
             chat.send("replacing [country, username, phone] in the dataframe- `df_nan`. Please wait....")
             df_nan.at[ind, 'country'] = country_name
-            df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "product_a").decode('utf-8')).get("username")
+            df_nan.at[ind, 'username'] = uname
             df_nan.at[ind, 'phone'] = key_phone
 
             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
