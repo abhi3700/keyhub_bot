@@ -1,3 +1,5 @@
 - apply the same (i.e. A) for all other products - B, C, D, E
+  + coding
+  - testing
 - check stats for all products corresponding to a user
 - check if a user from a channel using `bot.py`

@@ -99,7 +99,4 @@ print(r.keys())
 for k in r.keys():
     k_decoded = k.decode('utf-8')
     print(json.loads(r.hget(k_decoded, "product_a").decode('utf-8')))
-
-print(json.loads(r.hget('+918146210685', "product_a").decode('utf-8')))
-
-print(type(str(datetime.date.today())))
+    print(json.loads(r.hget(k_decoded, "product_a").decode('utf-8')).get("country"))

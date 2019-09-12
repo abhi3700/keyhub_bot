@@ -119,7 +119,7 @@ def requestkey_command(chat, message, args):
         btns[0].callback("D", "productd")     # button - Product D
         btns[0].callback("E", "producte")     # button - Product E
 
-        chat.send("Okay! Select one of the products below -", attach= btns)
+        chat.send("Okay! Select one of the products below -\nA - Android \nB - Windows", attach= btns)
     else:
         chat.send("Please, share the phone no. first via /sharephone")
         # chat.send("phone no. is: {phone}".format(phone= key_phone))  # for DEBUG
@@ -135,23 +135,28 @@ def notify_callback(query, data, chat, message):
 """
 @bot.callback("producta")
 def producta_callback(query, chat, message):
+    # chat.send("Now, please share your details --> [username, location] via /sendinfoa command.")
     chat.send("Now, please share your details --> [username, location] via /shareinfoa command.")
 
 @bot.callback("productb")
 def productb_callback(query, chat, message):
-    chat.send("Now, please share your details --> [username, location] via /sendinfob command.")
+    # chat.send("Now, please share your details --> [username, location] via /sendinfob command.")
+    chat.send("Now, please share your details --> [username, location] via /shareinfob command.")
 
 @bot.callback("productc")
 def productc_callback(query, chat, message):
-    chat.send("Now, please share your details --> [username, location] via /sendinfoc command.")
+    # chat.send("Now, please share your details --> [username, location] via /sendinfoc command.")
+    chat.send("Now, please share your details --> [username, location] via /shareinfoc command.")
 
 @bot.callback("productd")
 def productd_callback(query, chat, message):
-    chat.send("Now, please share your details --> [username, location] via /sendinfod command.")
+    # chat.send("Now, please share your details --> [username, location] via /sendinfod command.")
+    chat.send("Now, please share your details --> [username, location] via /shareinfod command.")
 
 @bot.callback("producte")
 def producte_callback(query, chat, message):
-    chat.send("Now, please share your details --> [username, location] via /sendinfoe command.")
+    # chat.send("Now, please share your details --> [username, location] via /sendinfoe command.")
+    chat.send("Now, please share your details --> [username, location] via /shareinfoe command.")
 
 # # ========================================================User Information for Product A==================================================================
 # @bot.command("sendinfoa")
@@ -212,11 +217,12 @@ def producte_callback(query, chat, message):
 # =========================================================User Information for Product A==============================================================
 @bot.command("shareinfoa")
 def shareinfoa_command(chat, message, args):
-    """User has to share information: """
-    
+    """User has to share information about product-A"""
+    # uname = query.sender.username
     uname = message.sender.username
 
     # find the root phoneno. if username is available in REDIS DB
+    chat.send('Finding if your username exists with us.....')
     key_phone = ""
     for k in r.keys():
         # print(k.decode('utf-8'))
@@ -230,228 +236,51 @@ def shareinfoa_command(chat, message, args):
     if key_phone != "":
         if response.status_code == 200:
             country_name = response_json.get("country_name")
-
-            r.hset(key_phone, "product_a", json.dumps(dict(username= uname)))
-            r.hset(key_phone, "product_a", json.dumps(dict(country= country_name)))
-
-            chat.send("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "product_a").decode('utf-8')).get("country")))
+            chat.send('Country: \'{country}\' noted'.format(country= country_name))
+            chat.send('Username: \'{username}\' noted'.format(username= uname))
 
             # Read the SQL table
-            chat.send("Reading the SQL database. Please wait...")
-            df_sql_a = pd.read_sql_table('product_a', sqlengine)
+            chat.send("Please wait...")
+            # chat.send("Reading the SQL database. Please wait...")   # for DEBUG
+            df_sql = pd.read_sql_table('product_a', sqlengine)
 
-            # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-            df_nan = df_sql_a[(df_sql_a['country'].isnull()) & (df_sql_a['username'].isnull()) & (df_sql_a['phone'].isnull())]
+            """ Fetch 'product_key' from DB (in excel) with username & country & phone as empty."""
+            df_nan = df_sql[(df_sql['country'].isnull()) & (df_sql['username'].isnull()) & (df_sql['phone'].isnull())]
+            df_nan.fillna('', inplace=True)     # replace 'NaN' with empty/blank string, bcoz when empty `df_nan`, then can't put value due to datatype mismatch (float vs str) 
             ind = df_nan.index.tolist()[0]
             key = df_nan.loc[ind, 'keys']
             chat.send("your key is \n{productkey}".format(productkey= key))
 
-            # Now, note the key, datetime in Redis DB
-            r.hset(key_phone, "product_a", json.dumps(dict(key= key)))
-            r.hset(key_phone, "product_a", json.dumps(dict(datetime= str(datetime.date.today()))))
+            """ Now, note the username, country, key, datetime in Redis DB"""
+            r.hset(key_phone, "product_a", 
+                json.dumps(dict(username= uname, 
+                                country= country_name, 
+                                key= key, 
+                                datetime= str(datetime.date.today())
+                                )))
 
-            # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-            chat.send("replacing [country, username, phone] in the dataframe- `df_nan`. Please wait....")
+            """ After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB. """
+            # chat.send("replacing [country, username, phone] in the dataframe- `df_nan`. Please wait....")   # for DEBUG
             df_nan.at[ind, 'country'] = country_name
             df_nan.at[ind, 'username'] = uname
             df_nan.at[ind, 'phone'] = key_phone
 
-            # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-            df_sql_a.loc[ind] = df_nan.loc[ind]
+            # replace the ith row (as per index) of df_sql (for e.g.) with df_nan
+            df_sql.loc[ind] = df_nan.loc[ind]
 
             # write the modified dataframe to PostgreSQL table
-            chat.send("Uploading modified dataframe to the SQL database. Please wait....")
-            du.pd_to_psql(df_sql_a, cfg_uri_psql, 'product_a', if_exists='replace')
-            chat.send("user details saved in PostgreSQL")   # for DEBUG
-            chat.send("DONE!")
+            chat.send("Few more seconds, please.....")
+            # chat.send("Uploading modified dataframe to the SQL database. Please wait....")      # for DEBUG
+            du.pd_to_psql(df_sql, cfg_uri_psql, 'product_a', if_exists='replace')
+            # chat.send("user details saved in PostgreSQL")   # for DEBUG
+            chat.send("DONE! \nFor more, use /help command.")
 
         else:
             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
     else:
         chat.send("Please, share the phone no. first via /sharephone")
 
-# @bot.callback("shareinfob")
-# def shareinfob_callback(query, chat, message):
-#     user = query.sender
-#     uname = user.username
 
-#     response = requests.get(geo_URL, verify= False)
-#     response_json = response.json()     # type - 'dict'
-
-#     if key_phone != "":
-#         if response.status_code == 200:
-#             country_name = response_json.get("country_name")
-
-#             r.hset(key_phone, "ProductB", json.dumps(dict(username= uname)))
-#             r.hset(key_phone, "ProductB", json.dumps(dict(country= country_name)))
-
-#             query.notify("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "ProductB").decode('utf-8')).get("country")))
-
-#             # Read the SQL table
-#             df_sql_b = pd.read_sql_table('product_b', sqlengine)
-
-#             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-#             df_nan = df_sql_b[(df_sql_b['country'].isnull()) & (df_sql_b['username'].isnull()) & (df_sql_b['phone'].isnull())]
-#             ind = df_nan.index.tolist()[0]
-#             key = df_nan.loc[ind, 'keys']
-#             chat.send("your key is \n{productkey}".format(productkey= key))
-
-#             # Now, note the key, datetime in Redis DB
-#             r.hset(key_phone, "ProductB", json.dumps(dict(key= key)))
-#             r.hset(key_phone, "ProductB", json.dumps(dict(datetime= datetime.date.today())))
-            
-#             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-#             df_nan.at[ind, 'country'] = country_name
-#             df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "ProductB").decode('utf-8')).get("username")
-#             df_nan.at[ind, 'phone'] = key_phone
-
-#             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-#             df_sql_b.loc[ind] = df_nan.loc[ind]
-
-#             # write the modified dataframe to PostgreSQL table
-#             du.pd_to_psql(df_sql_b, cfg_uri_psql, 'product_b', if_exists='replace')
-
-#         else:
-#             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
-#     else:
-#         chat.send("Please, share the phone no. first via /sharephone")
-
-# @bot.callback("shareinfoc")
-# def shareinfoc_callback(query, chat, message):
-#     user = query.sender
-#     uname = user.username
-
-#     response = requests.get(geo_URL, verify= False)
-#     response_json = response.json()     # type - 'dict'
-
-#     if key_phone != "":
-#         if response.status_code == 200:
-#             country_name = response_json.get("country_name")
-
-#             r.hset(key_phone, "ProductC", json.dumps(dict(username= uname)))
-#             r.hset(key_phone, "ProductC", json.dumps(dict(country= country_name)))
-
-#             query.notify("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "ProductC").decode('utf-8')).get("country")))
-
-#             # Read the SQL table
-#             df_sql_c = pd.read_sql_table('product_c', sqlengine)
-
-#             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-#             df_nan = df_sql_c[(df_sql_c['country'].isnull()) & (df_sql_c['username'].isnull()) & (df_sql_c['phone'].isnull())]
-#             ind = df_nan.index.tolist()[0]
-#             key = df_nan.loc[ind, 'keys']
-#             chat.send("your key is \n{productkey}".format(productkey= key))
-
-#             # Now, note the key, datetime in Redis DB
-#             r.hset(key_phone, "ProductC", json.dumps(dict(key= key)))
-#             r.hset(key_phone, "ProductC", json.dumps(dict(datetime= datetime.date.today())))
-            
-#             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-#             df_nan.at[ind, 'country'] = country_name
-#             df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "ProductC").decode('utf-8')).get("username")
-#             df_nan.at[ind, 'phone'] = key_phone
-
-#             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-#             df_sql_c.loc[ind] = df_nan.loc[ind]
-
-#             # write the modified dataframe to PostgreSQL table
-#             du.pd_to_psql(df_sql_c, cfg_uri_psql, 'product_c', if_exists='replace')
-
-#         else:
-#             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
-#     else:
-#         chat.send("Please, share the phone no. first via /sharephone")
-
-# @bot.callback("shareinfod")
-# def shareinfod_callback(query, chat, message):
-#     user = query.sender
-#     uname = user.username
-
-#     response = requests.get(geo_URL, verify= False)
-#     response_json = response.json()     # type - 'dict'
-
-#     if key_phone != "":
-#         if response.status_code == 200:
-#             country_name = response_json.get("country_name")
-#             r.hset(key_phone, "ProductD", json.dumps(dict(username= uname)))
-#             r.hset(key_phone, "ProductD", json.dumps(dict(country= country_name)))
-
-#             query.notify("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "ProductD").decode('utf-8')).get("country")))
-
-#             # Read the SQL table
-#             df_sql_d = pd.read_sql_table('product_d', sqlengine)
-
-#             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-#             df_nan = df_d[(df_d['country'].isnull()) & (df_d['username'].isnull()) & (df_d['phone'].isnull())]
-#             ind = df_nan.index.tolist()[0]
-#             key = df_nan.loc[ind, 'keys']
-#             chat.send("your key is \n{productkey}".format(productkey= key))
-
-#             # Now, note the key, datetime in Redis DB
-#             r.hset(key_phone, "ProductD", json.dumps(dict(key= key)))
-#             r.hset(key_phone, "ProductD", json.dumps(dict(datetime= datetime.date.today())))
-            
-#             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-#             df_nan.at[ind, 'country'] = country_name
-#             df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "ProductD").decode('utf-8')).get("username")
-#             df_nan.at[ind, 'phone'] = key_phone
-
-#             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-#             df_d.loc[ind] = df_nan.loc[ind]
-
-#             # write the modified dataframe to PostgreSQL table
-#             du.pd_to_psql(df_sql_d, cfg_uri_psql, 'product_d', if_exists='replace')
-
-#         else:
-#             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
-#     else:
-#         chat.send("Please, share the phone no. first via /sharephone")
-
-# @bot.callback("shareinfoe")
-# def shareinfoe_callback(query, chat, message):
-#     user = query.sender
-#     uname = user.username
-
-#     response = requests.get(geo_URL, verify= False)
-#     response_json = response.json()     # type - 'dict'
-
-#     if key_phone != "":
-#         if response.status_code == 200:
-#             country_name = response_json.get("country_name")
-
-#             r.hset(key_phone, "ProductE", json.dumps(dict(username= uname)))
-#             r.hset(key_phone, "ProductE", json.dumps(dict(country= country_name)))
-
-#             query.notify("country: {country} saved.".format(country= json.loads(r.hget(key_phone, "ProductE").decode('utf-8')).get("country")))
-
-#             # Read the SQL table
-#             df_sql_e = pd.read_sql_table('product_e', sqlengine)
-
-#             # Fetch 'product_key' from DB (in excel) with username & country & phone as empty.
-#             df_nan = df_sql_e[(df_sql_e['country'].isnull()) & (df_sql_e['username'].isnull()) & (df_sql_e['phone'].isnull())]
-#             ind = df_nan.index.tolist()[0]
-#             key = df_nan.loc[ind, 'keys']
-#             chat.send("your key is \n{productkey}".format(productkey= key))
-
-#             # Now, note the key, datetime in Redis DB
-#             r.hset(key_phone, "ProductE", json.dumps(dict(key= key)))
-#             r.hset(key_phone, "ProductE", json.dumps(dict(datetime= datetime.date.today())))
-            
-#             # After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB.
-#             df_nan.at[ind, 'country'] = country_name
-#             df_nan.at[ind, 'username'] = json.loads(r.hget(key_phone, "ProductE").decode('utf-8')).get("username")
-#             df_nan.at[ind, 'phone'] = key_phone
-
-#             # replace the ith row (as per index) of df_sql_a (for e.g.) with df_nan
-#             df_sql_e.loc[ind] = df_nan.loc[ind]
-
-#             # write the modified dataframe to PostgreSQL table
-#             du.pd_to_psql(df_sql_e, cfg_uri_psql, 'product_', if_exists='replace')
-
-#         else:
-#             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
-#     else:
-#         chat.send("Please, share the phone no. first via /sharephone")
 # ======================================================Key Usage Stats==========================================================
 # @bot.command("keystatsa")
 # def keystatsa_command(chat, message, args):
@@ -462,7 +291,7 @@ def shareinfoa_command(chat, message, args):
 #     """
 #     uname = message.sender.username
 
-#     df_search = df_sql_a.loc[df_sql_a['username'].isin([uname])]
+#     df_search = df_sql.loc[df_sql['username'].isin([uname])]
 
 #     if len(df_search) != 0:
 #         chat.send("The keys accessed so far:")
