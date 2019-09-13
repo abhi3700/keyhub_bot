@@ -5,3 +5,4 @@ pandas
 numpy
 sqlalchemy
 d6tstack
+psycopg2
