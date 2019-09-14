@@ -23,9 +23,9 @@ r = redis.from_url(REDIS_URL)
 sqlengine = sqlalchemy.create_engine(cfg_uri_psql)
 
 # =======================================================Share phone via keyboard===========================================================================
-@bot.command("sharephoneloc")
-def sharephoneloc_command(chat, message, args):
-    """Share your phone no., location via clicking the available below."""
+@bot.command("sharephone")
+def sharephone_command(chat, message, args):
+    """Share your phone no. via clicking the keyboard below."""
     bot.api.call('sendMessage', {
         'chat_id': chat.id,
         'text': 'Please click on keyboard below to share your phone no.',
@@ -40,6 +40,33 @@ def sharephoneloc_command(chat, message, args):
                         'text': 'Phone no.',
                         'request_contact': True,
                     },
+                ],
+            ],
+            # These 3 parameters below are optional
+            # See https://core.telegram.org/bots/api#replykeyboardmarkup
+            'resize_keyboard': True,
+            'one_time_keyboard': True,
+            'selective': True,
+        }),
+    })
+
+@bot.command("shareloc")
+def shareloc_command(chat, message, args):
+    """Share your location via clicking the keyboard below."""
+    bot.api.call('sendMessage', {
+        'chat_id': chat.id,
+        'text': 'Please click on keyboard below to share your location',
+        'reply_markup': json.dumps({
+            'keyboard': [
+                [
+                    {
+                        'text': 'location',
+                        'request_location': True,
+                    },
+                    # {
+                    #     'text': 'Phone no.',
+                    #     'request_contact': True,
+                    # },
                 ],
             ],
             # These 3 parameters below are optional
@@ -75,27 +102,29 @@ def button_messages_are_like_normal_messages(chat, message):
                 key_phone = k.decode('utf-8')
 
         chat.send('You choose to send your contact no.: {phone}'.format(phone= key_phone))
-        chat.send("Now, please share your location via keyboard below -->")
+        chat.send("Now, please share your location via /shareloc")
         # chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
 
-    # elif message.location:
-    #     # find the root phoneno. if username is available in REDIS DB
-    #     key_phone = ""
-    #     for k in r.keys():
-    #         # print(k.decode('utf-8'))
-    #         dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
-    #         if dict_nested2_val2['username'] == message.sender.username:
-    #             key_phone = k.decode('utf-8')
+    elif message.location:
+        # find the root phoneno. if username is available in REDIS DB
+        key_phone = ""
+        for k in r.keys():
+            # print(k.decode('utf-8'))
+            dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+            if dict_nested2_val2['username'] == message.sender.username:
+                key_phone = k.decode('utf-8')
 
-    #     if key_phone != "":
-    #         # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
-    #         r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
-    #                                                  lat= message.location.latitude,
-    #                                                  lon= message.location.longitude)))
+        if key_phone != "":
+            # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
+            r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
+                                                     lat= message.location.latitude,
+                                                     lon= message.location.longitude
+                                                     datetoday= datetime.date.today())))
 
-    #         chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
-    #     else:
-    #         chat.send("Please, share the phone no. first via /sharephoneloc")
+            # chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
+            chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
+        else:
+            chat.send("Please, share the phone no. first via /sharephone")
 
     chat.send('Press /removekeyboard to remove the annoying keyboard')
 
@@ -144,7 +173,7 @@ def requestkey_command(chat, message, args):
 
         chat.send("Okay! Select one of the products below -\nA - Android \nB - Windows", attach= btns)
     else:
-        chat.send("Please, share the phone no. first via /sharephoneloc")
+        chat.send("Please, share the phone no. first via /sharephone")
         # chat.send("phone no. is: {phone}".format(phone= key_phone))  # for DEBUG
 
 # ----------------------------------------------------------------Product buttons CALLBACK------------------------------------------------------------------
@@ -257,38 +286,14 @@ def shareinfoa_command(chat, message, args):
 
     if key_phone != "":
         # chat.send("Inside key_phone if-else loop")      # for DEBUG
-        bot.api.call('sendMessage', {
-            'chat_id': chat.id,
-            'text': 'Please click on keyboard below to share your location',
-            'reply_markup': json.dumps({
-                'keyboard': [
-                    [
-                        {
-                            'text': 'location',
-                            'request_location': True,
-                        },
-                        # {
-                        #     'text': 'Phone no.',
-                        #     'request_contact': True,
-                        # },
-                    ],
-                ],
-                # These 3 parameters below are optional
-                # See https://core.telegram.org/bots/api#replykeyboardmarkup
-                'resize_keyboard': True,
-                'one_time_keyboard': True,
-                'selective': True,
-            }),
-        })
         # lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
         # lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
+        datetoday = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("datetoday")
 
         # if (lat != "") and (lon != ""):
-        if message.location:
+        # if message.location:
+        if datetoday == datetime.date.today():
             chat.send("Inside location if-else loop")      # for DEBUG
-            r.hset(key_phone, "info", json.dumps(dict(username= uname,
-                                                     lat= message.location.latitude,
-                                                     lon= message.location.longitude)))
 
             lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
             lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
@@ -346,9 +351,9 @@ def shareinfoa_command(chat, message, args):
             else:
                 chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
         else:
-            chat.send("Please, share your location via keyboard below -->")
+            chat.send("Please, share your location via /shareloc")
     else:
-        chat.send("Please, share the phone no. first via /sharephoneloc")
+        chat.send("Please, share the phone no. first via /sharephone")
 
 # =========================================================User Information for Product A==============================================================
 @bot.command("shareinfob")
@@ -418,7 +423,7 @@ def shareinfob_command(chat, message, args):
         else:
             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
     else:
-        chat.send("Please, share the phone no. first via /sharephoneloc")
+        chat.send("Please, share the phone no. first via /sharephone")
 
 # ======================================================Key Usage Stats==========================================================
 # @bot.command("keystatsa")
