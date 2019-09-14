@@ -252,39 +252,46 @@ def shareinfoa_command(chat, message, args):
         dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
         if dict_nested2_val2['username'] == message.sender.username:
             key_phone = k.decode('utf-8')
-    chat.send("key_phone is: {key_phone}".format(key_phone= key_phone))
-    bot.api.call('sendMessage', {
-        'chat_id': chat.id,
-        'text': 'Please click on keyboard below to share your location',
-        'reply_markup': json.dumps({
-            'keyboard': [
-                [
-                    {
-                        'text': 'location',
-                        'request_location': True,
-                    },
-                    # {
-                    #     'text': 'Phone no.',
-                    #     'request_contact': True,
-                    # },
-                ],
-            ],
-            # These 3 parameters below are optional
-            # See https://core.telegram.org/bots/api#replykeyboardmarkup
-            'resize_keyboard': True,
-            'one_time_keyboard': True,
-            'selective': True,
-        }),
-    })
+    # chat.send("key_phone is: {key_phone}".format(key_phone= key_phone))   # for DEBUG
 
 
     if key_phone != "":
-        chat.send("Inside key_phone if-else loop")      # for DEBUG
-        lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
-        lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
+        # chat.send("Inside key_phone if-else loop")      # for DEBUG
+        bot.api.call('sendMessage', {
+            'chat_id': chat.id,
+            'text': 'Please click on keyboard below to share your location',
+            'reply_markup': json.dumps({
+                'keyboard': [
+                    [
+                        {
+                            'text': 'location',
+                            'request_location': True,
+                        },
+                        # {
+                        #     'text': 'Phone no.',
+                        #     'request_contact': True,
+                        # },
+                    ],
+                ],
+                # These 3 parameters below are optional
+                # See https://core.telegram.org/bots/api#replykeyboardmarkup
+                'resize_keyboard': True,
+                'one_time_keyboard': True,
+                'selective': True,
+            }),
+        })
+        # lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
+        # lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
 
-        if (lat != "") and (lon != ""):
-            chat.send("Inside location if-else loop")      # for DEBUG
+        # if (lat != "") and (lon != ""):
+        if message.location:
+            # chat.send("Inside location if-else loop")      # for DEBUG
+            r.hset(key_phone, "info", json.dumps(dict(username= uname,
+                                                     lat= message.location.latitude,
+                                                     lon= message.location.longitude)))
+
+            lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
+            lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
 
             geo_URL = google_str_geo.format(lat= lat, lon= lon)
 
