@@ -278,6 +278,8 @@ def shareinfoa_command(chat, message, args):
 
 
     if key_phone != "":
+        chat.send(json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat"))
+        chat.send(json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon"))
         if (json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat") != "") and (json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon") != ""):
 
             lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
