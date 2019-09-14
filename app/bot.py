@@ -32,10 +32,10 @@ def sharephoneloc_command(chat, message, args):
         'reply_markup': json.dumps({
             'keyboard': [
                 [
-                    # {
-                    #     'text': 'location',
-                    #     'request_location': True,
-                    # },
+                    {
+                        'text': 'location',
+                        'request_location': True,
+                    },
                     {
                         'text': 'Phone no.',
                         'request_contact': True,
@@ -61,7 +61,7 @@ def button_messages_are_like_normal_messages(chat, message):
     #     chat.send('You choose %s' % message.text)
     if message.contact:
         phoneno = message.contact.phone_number
-        phoneno = phoneno.replace("+", "")
+        phoneno = phoneno.replace("+", "")      # '+91343242343' --> '91343242343'Unlike phone app, in Telegram desktop app, it's '+' sign in phone no.
 
         # Create a node - `phone` and store `username` in REDIS DB. This is bcoz in botogram, can't set global_variable.
         r.hset(phoneno, "info", json.dumps(dict(username= message.sender.username)))
@@ -75,7 +75,8 @@ def button_messages_are_like_normal_messages(chat, message):
                 key_phone = k.decode('utf-8')
 
         chat.send('You choose to send your contact no.: {phone}'.format(phone= key_phone))
-        chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
+        chat.send("Now, please share your location via keyboard below -->")
+        # chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
 
     elif message.location:
         # find the root phoneno. if username is available in REDIS DB
@@ -252,29 +253,29 @@ def shareinfoa_command(chat, message, args):
         if dict_nested2_val2['username'] == message.sender.username:
             key_phone = k.decode('utf-8')
 
-    bot.api.call('sendMessage', {
-        'chat_id': chat.id,
-        'text': 'Please click on keyboard below to share your location',
-        'reply_markup': json.dumps({
-            'keyboard': [
-                [
-                    {
-                        'text': 'location',
-                        'request_location': True,
-                    },
-                    # {
-                    #     'text': 'Phone no.',
-                    #     'request_contact': True,
-                    # },
-                ],
-            ],
-            # These 3 parameters below are optional
-            # See https://core.telegram.org/bots/api#replykeyboardmarkup
-            'resize_keyboard': True,
-            'one_time_keyboard': True,
-            'selective': True,
-        }),
-    })
+    # bot.api.call('sendMessage', {
+    #     'chat_id': chat.id,
+    #     'text': 'Please click on keyboard below to share your location',
+    #     'reply_markup': json.dumps({
+    #         'keyboard': [
+    #             [
+    #                 {
+    #                     'text': 'location',
+    #                     'request_location': True,
+    #                 },
+    #                 # {
+    #                 #     'text': 'Phone no.',
+    #                 #     'request_contact': True,
+    #                 # },
+    #             ],
+    #         ],
+    #         # These 3 parameters below are optional
+    #         # See https://core.telegram.org/bots/api#replykeyboardmarkup
+    #         'resize_keyboard': True,
+    #         'one_time_keyboard': True,
+    #         'selective': True,
+    #     }),
+    # })
 
 
     if key_phone != "":
