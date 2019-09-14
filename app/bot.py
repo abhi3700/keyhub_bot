@@ -499,6 +499,21 @@ def shareinfob_command(chat, message, args):
 #     else:
 #         chat.send("No product keys accessed.")
     
+@bot.command("rgeocode")
+def rgeocode_command(chat, message, args):
+    """test google geocoding API"""
+    lat = 30.704026
+    lon = 76.681145
+
+    geo_URL = google_str_geo.format(lat= lat, lon= lon)
+    response = requests.get(geo_URL, verify= False)
+
+    response_json = response.json()
+
+    # print(response.status_code)
+    chat.send(response_json["status"])
+    chat.send(response_json["results"][0]["address_components"][6]["long_name"])
+
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
     bot.run()
