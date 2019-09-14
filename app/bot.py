@@ -118,7 +118,7 @@ def button_messages_are_like_normal_messages(chat, message):
             # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
             r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
                                                      lat= message.location.latitude,
-                                                     lon= message.location.longitude
+                                                     lon= message.location.longitude,
                                                      datetoday= datetime.date.today())))
 
             # chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
@@ -210,61 +210,6 @@ def productb_callback(query, chat, message):
 #     # chat.send("Now, please share your details --> [username, location] via /sendinfoe command.")
 #     chat.send("Now, please share your details --> [username, location] via /shareinfoe command.")
 
-# # ========================================================User Information for Product A==================================================================
-# @bot.command("sendinfoa")
-# def sendinfoa_command(chat, message, args):
-#     """User has to click a 'Info.' button for giving information"""
-#     btns = botogram.Buttons()
-    
-#     btns[0].callback("Info.", "shareinfoa")     # button - Username
-#     # btns[1].callback("Location", "locationa")     # button - Location
-    
-#     chat.send("Please, click on the button below", attach= btns)
-
-
-# # ========================================================User Information for Product B==================================================================
-# @bot.command("sendinfob")
-# def sendinfob_command(chat, message, args):
-#     """User has to click a 'Info.' button for giving information"""
-#     btns = botogram.Buttons()
-    
-#     btns[0].callback("Info.", "shareinfob")     # button - Username
-#     # btns[1].callback("Location", "locationa")     # button - Location
-    
-#     chat.send("Please, click on the button below", attach= btns)
-
-# # ========================================================User Information for Product C==================================================================
-# @bot.command("sendinfoc")
-# def sendinfoc_command(chat, message, args):
-#     """User has to click a 'Info.' button for giving information"""
-#     btns = botogram.Buttons()
-    
-#     btns[0].callback("Info.", "shareinfoc")     # button - Username
-#     # btns[1].callback("Location", "locationa")     # button - Location
-    
-#     chat.send("Please, click on the button below", attach= btns)
-
-# # ========================================================User Information for Product D==================================================================
-# @bot.command("sendinfod")
-# def sendinfod_command(chat, message, args):
-#     """User has to click a 'Info.' button for giving information"""
-#     btns = botogram.Buttons()
-    
-#     btns[0].callback("Info.", "shareinfod")     # button - Username
-#     # btns[1].callback("Location", "locationa")     # button - Location
-    
-#     chat.send("Please, click on the button below", attach= btns)
-
-# # ========================================================User Information for Product E==================================================================
-# @bot.command("sendinfoe")
-# def sendinfoe_command(chat, message, args):
-#     """User has to click a 'Info.' button for giving information"""
-#     btns = botogram.Buttons()
-    
-#     btns[0].callback("Info.", "shareinfoe")     # button - Username
-#     # btns[1].callback("Location", "locationa")     # button - Location
-    
-#     chat.send("Please, click on the button below", attach= btns)
 
 # =========================================================User Information for Product A==============================================================
 @bot.command("shareinfoa")
