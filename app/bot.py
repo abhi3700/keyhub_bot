@@ -32,10 +32,10 @@ def sharephoneloc_command(chat, message, args):
         'reply_markup': json.dumps({
             'keyboard': [
                 [
-                    {
-                        'text': 'location',
-                        'request_location': True,
-                    },
+                    # {
+                    #     'text': 'location',
+                    #     'request_location': True,
+                    # },
                     {
                         'text': 'Phone no.',
                         'request_contact': True,
@@ -253,29 +253,29 @@ def shareinfoa_command(chat, message, args):
         if dict_nested2_val2['username'] == message.sender.username:
             key_phone = k.decode('utf-8')
     chat.send("key_phone is: {key_phone}".format(key_phone= key_phone))
-    # bot.api.call('sendMessage', {
-    #     'chat_id': chat.id,
-    #     'text': 'Please click on keyboard below to share your location',
-    #     'reply_markup': json.dumps({
-    #         'keyboard': [
-    #             [
-    #                 {
-    #                     'text': 'location',
-    #                     'request_location': True,
-    #                 },
-    #                 # {
-    #                 #     'text': 'Phone no.',
-    #                 #     'request_contact': True,
-    #                 # },
-    #             ],
-    #         ],
-    #         # These 3 parameters below are optional
-    #         # See https://core.telegram.org/bots/api#replykeyboardmarkup
-    #         'resize_keyboard': True,
-    #         'one_time_keyboard': True,
-    #         'selective': True,
-    #     }),
-    # })
+    bot.api.call('sendMessage', {
+        'chat_id': chat.id,
+        'text': 'Please click on keyboard below to share your location',
+        'reply_markup': json.dumps({
+            'keyboard': [
+                [
+                    {
+                        'text': 'location',
+                        'request_location': True,
+                    },
+                    # {
+                    #     'text': 'Phone no.',
+                    #     'request_contact': True,
+                    # },
+                ],
+            ],
+            # These 3 parameters below are optional
+            # See https://core.telegram.org/bots/api#replykeyboardmarkup
+            'resize_keyboard': True,
+            'one_time_keyboard': True,
+            'selective': True,
+        }),
+    })
 
 
     if key_phone != "":
