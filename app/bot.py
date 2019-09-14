@@ -61,6 +61,7 @@ def button_messages_are_like_normal_messages(chat, message):
     #     chat.send('You choose %s' % message.text)
     if message.contact:
         phoneno = message.contact.phone_number
+        phoneno = phoneno.replace("+", "")
 
         # Create a node - `phone` and store `username` in REDIS DB. This is bcoz in botogram, can't set global_variable.
         r.hset(phoneno, "info", json.dumps(dict(username= message.sender.username)))
