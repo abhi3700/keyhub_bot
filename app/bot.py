@@ -279,14 +279,13 @@ def shareinfoa_command(chat, message, args):
 
 
     if key_phone != "":
-        chat.send("Inside key_phone if-else loop")
-        chat.send(json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat"))
-        chat.send(json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon"))
-        if (json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat") != "") and (json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon") != ""):
-            chat.send("Inside location if-else loop")
+        chat.send("Inside key_phone if-else loop")      # for DEBUG
+        lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
+        lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
 
-            lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
-            lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
+        if (lat != "") and (lon != ""):
+            chat.send("Inside location if-else loop")      # for DEBUG
+
             geo_URL = google_str_geo.format(lat= lat, lon= lon)
 
             response = requests.get(geo_URL, verify= False)
