@@ -78,24 +78,24 @@ def button_messages_are_like_normal_messages(chat, message):
         chat.send("Now, please share your location via keyboard below -->")
         # chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
 
-    elif message.location:
-        # find the root phoneno. if username is available in REDIS DB
-        key_phone = ""
-        for k in r.keys():
-            # print(k.decode('utf-8'))
-            dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
-            if dict_nested2_val2['username'] == message.sender.username:
-                key_phone = k.decode('utf-8')
+    # elif message.location:
+    #     # find the root phoneno. if username is available in REDIS DB
+    #     key_phone = ""
+    #     for k in r.keys():
+    #         # print(k.decode('utf-8'))
+    #         dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+    #         if dict_nested2_val2['username'] == message.sender.username:
+    #             key_phone = k.decode('utf-8')
 
-        if key_phone != "":
-            # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
-            r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
-                                                     lat= message.location.latitude,
-                                                     lon= message.location.longitude)))
+    #     if key_phone != "":
+    #         # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
+    #         r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
+    #                                                  lat= message.location.latitude,
+    #                                                  lon= message.location.longitude)))
 
-            chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
-        else:
-            chat.send("Please, share the phone no. first via /sharephoneloc")
+    #         chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
+    #     else:
+    #         chat.send("Please, share the phone no. first via /sharephoneloc")
 
     chat.send('Press /removekeyboard to remove the annoying keyboard')
 
@@ -285,7 +285,7 @@ def shareinfoa_command(chat, message, args):
 
         # if (lat != "") and (lon != ""):
         if message.location:
-            # chat.send("Inside location if-else loop")      # for DEBUG
+            chat.send("Inside location if-else loop")      # for DEBUG
             r.hset(key_phone, "info", json.dumps(dict(username= uname,
                                                      lat= message.location.latitude,
                                                      lon= message.location.longitude)))
