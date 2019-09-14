@@ -292,7 +292,7 @@ def shareinfoa_command(chat, message, args):
             
             response_json = response.json()     # type - 'dict'
             if response_json["status"] == "OK":
-                country_name = response_json["results"][0]["address_components"][6]["long_name"]
+                country_name = response_json["results"][0]["address_components"][7]["long_name"]
                 chat.send('Country: \'{country}\' noted'.format(country= country_name))
                 chat.send('Username: \'{username}\' noted'.format(username= uname))
 
