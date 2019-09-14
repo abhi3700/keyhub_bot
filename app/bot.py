@@ -252,7 +252,7 @@ def shareinfoa_command(chat, message, args):
         dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
         if dict_nested2_val2['username'] == message.sender.username:
             key_phone = k.decode('utf-8')
-
+    chat.send("key_phone is: {key_phone}".format(key_phone= key_phone))
     # bot.api.call('sendMessage', {
     #     'chat_id': chat.id,
     #     'text': 'Please click on keyboard below to share your location',
@@ -279,9 +279,11 @@ def shareinfoa_command(chat, message, args):
 
 
     if key_phone != "":
+        chat.send("Inside key_phone if-else loop")
         chat.send(json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat"))
         chat.send(json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon"))
         if (json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat") != "") and (json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon") != ""):
+            chat.send("Inside location if-else loop")
 
             lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
             lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
