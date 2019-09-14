@@ -275,16 +275,16 @@ def shareinfoa_command(chat, message, args):
         }),
     })
 
-    if json.loads(r.hget(k_decoded, "info").decode('utf-8')).get("lat") != "" and json.loads(r.hget(k_decoded, "info").decode('utf-8')).get("lon") != ""
-        lat = message.location.latitude
-        lon = message.location.longitude
-        geo_URL = google_str_geo.format(lat= lat, lon= lon)
 
-        response = requests.get(geo_URL, verify= False)
-        
-        response_json = response.json()     # type - 'dict'
+    if key_phone != "":
+        if json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat") != "" and json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon") != ""
+            lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
+            lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
+            geo_URL = google_str_geo.format(lat= lat, lon= lon)
 
-        if key_phone != "":
+            response = requests.get(geo_URL, verify= False)
+            
+            response_json = response.json()     # type - 'dict'
             if response_json["status"] == "OK":
                 country_name = response_json["results"][0]["address_components"][6]["long_name"]
                 chat.send('Country: \'{country}\' noted'.format(country= country_name))
@@ -333,9 +333,9 @@ def shareinfoa_command(chat, message, args):
             else:
                 chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
         else:
-            chat.send("Please, share the phone no. first via /sharephoneloc")
+            chat.send("Please, share your location via keyboard below -->")
     else:
-        chat.send("Please, share your location via keyboard below -->")
+        chat.send("Please, share the phone no. first via /sharephoneloc")
 
 # =========================================================User Information for Product A==============================================================
 @bot.command("shareinfob")

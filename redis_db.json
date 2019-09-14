@@ -4,7 +4,7 @@
         "info": {        // this is to store the phoneno & username during contact share.
             "username": "abhi3701",
             "lat": "30.928954",
-            "lng": "76.673643"            
+            "lon": "76.673643"            
         },
         "product_a": {
             "username": "abhi3701",
@@ -12,7 +12,7 @@
             "key": "Alltest2438542342374",	// last accessed product key
             "datetime": "2019-09-29",	// change datetime during key access
             // "lat": "30.928954",
-            // "lng": "76.673643"            
+            // "lon": "76.673643"            
             }
         },
 		
@@ -22,7 +22,7 @@
             "key": "Alltest542342374",	// last accessed product key
             "datetime": "2019-09-30",	// change datetime during key access
             // "lat": "30.928954",
-            // "lng": "76.673643"
+            // "lon": "76.673643"
             }
         },
 	},
@@ -31,7 +31,7 @@
         "info": {        // this is to store the phoneno & username during contact share.
             "username": "abhi3701",
             "lat": "36.705799",
-            "lng": "-120.112735"
+            "lon": "-120.112735"
         },
         "product_a": {
             "username": "scl4623",
@@ -39,7 +39,7 @@
             "key": "Alltest438543342374",	// last accessed product key
             "datetime": "2019-09-27",	// change datetime during key access
             // "lat": "36.705799",
-            // "lng": "-120.112735"
+            // "lon": "-120.112735"
             }
         },
         "product_b": {
@@ -48,7 +48,7 @@
             "key": "Alltest543342374",	// last accessed product key
             "datetime": "2019-09-21",	// change datetime during key access
             // "lat": "36.705799",
-            // "lng": "-120.112735"
+            // "lon": "-120.112735"
             }
 	},
 }

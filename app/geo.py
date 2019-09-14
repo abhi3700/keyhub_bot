@@ -36,3 +36,6 @@ print(response_json["results"][0]["address_components"][6]["long_name"])
 
 # if response_json["status"] == "OK":
 #     print("connection established")
+
+if lat != "":
+    print("empty lat")
