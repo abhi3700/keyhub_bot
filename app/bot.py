@@ -67,14 +67,14 @@ def button_messages_are_like_normal_messages(chat, message):
         r.hset(phoneno, "info", json.dumps(dict(username= message.sender.username)))
 
         # find the root phoneno. if username is available in REDIS DB
-        # key_phone = ""
-        # for k in r.keys():
-        #     # print(k.decode('utf-8'))
-        #     dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
-        #     if dict_nested2_val2['username'] == message.sender.username:
-        #         key_phone = k.decode('utf-8')
+        key_phone = ""
+        for k in r.keys():
+            # print(k.decode('utf-8'))
+            dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+            if dict_nested2_val2['username'] == message.sender.username:
+                key_phone = k.decode('utf-8')
 
-        chat.send('You choose to send your contact no.: {phone}'.format(phone= message.contact.phone_number))
+        chat.send('You choose to send your contact no.: {phone}'.format(phone= key_phone))
         chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
 
     elif message.location:
