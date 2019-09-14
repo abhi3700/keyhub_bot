@@ -96,7 +96,7 @@ print(r.keys())
 # for k in r.keys():
 #     r.delete(k)
 
-for k in r.keys():
-    k_decoded = k.decode('utf-8')
-    print(json.loads(r.hget(k_decoded, "product_a").decode('utf-8')))
-    print(json.loads(r.hget(k_decoded, "product_a").decode('utf-8')).get("country"))
+# for k in r.keys():
+#     k_decoded = k.decode('utf-8')
+#     print(json.loads(r.hget(k_decoded, "product_a").decode('utf-8')))
+#     print(json.loads(r.hget(k_decoded, "product_a").decode('utf-8')).get("country"))

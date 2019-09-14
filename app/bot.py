@@ -23,15 +23,19 @@ r = redis.from_url(REDIS_URL)
 sqlengine = sqlalchemy.create_engine(cfg_uri_psql)
 
 # =======================================================Share phone via keyboard===========================================================================
-@bot.command("sharephone")
-def sharephone_command(chat, message, args):
-    """Share your phone no. via clicking the available below."""
+@bot.command("sharephoneloc")
+def sharephoneloc_command(chat, message, args):
+    """Share your phone no., location via clicking the available below."""
     bot.api.call('sendMessage', {
         'chat_id': chat.id,
         'text': 'Please click on keyboard below to share your phone no.',
         'reply_markup': json.dumps({
             'keyboard': [
                 [
+                    # {
+                    #     'text': 'location',
+                    #     'request_location': True,
+                    # },
                     {
                         'text': 'Phone no.',
                         'request_contact': True,
@@ -55,24 +59,41 @@ def sharephone_command(chat, message, args):
 def button_messages_are_like_normal_messages(chat, message):
     # if message.text:
     #     chat.send('You choose %s' % message.text)
-    # elif message.location:
-    #     chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
     if message.contact:
         phoneno = message.contact.phone_number
 
         # Create a node - `phone` and store `username` in REDIS DB. This is bcoz in botogram, can't set global_variable.
-        r.hset(phoneno, "phoneno", json.dumps(dict(username= message.sender.username)))
+        r.hset(phoneno, "info", json.dumps(dict(username= message.sender.username)))
 
         # find the root phoneno. if username is available in REDIS DB
-        key_phone = ""
-        for k in r.keys():
-            # print(k.decode('utf-8'))
-            dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "phoneno"))
-            if dict_nested2_val2['username'] == message.sender.username:
-                key_phone = k.decode('utf-8')
+        # key_phone = ""
+        # for k in r.keys():
+        #     # print(k.decode('utf-8'))
+        #     dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+        #     if dict_nested2_val2['username'] == message.sender.username:
+        #         key_phone = k.decode('utf-8')
 
-        chat.send('You choose to send your contact no.: {phone}'.format(phone= key_phone))
+        chat.send('You choose to send your contact no.: {phone}'.format(phone= message.contact.phone_number))
         chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
+
+    # elif message.location:
+    #     # find the root phoneno. if username is available in REDIS DB
+    #     key_phone = ""
+    #     for k in r.keys():
+    #         # print(k.decode('utf-8'))
+    #         dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+    #         if dict_nested2_val2['username'] == message.sender.username:
+    #             key_phone = k.decode('utf-8')
+
+    #     if key_phone != "":
+    #         # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
+    #         r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
+    #                                                  lat= message.location.latitude,
+    #                                                  lon= message.location.longitude)))
+
+    #         chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
+    #     else:
+    #         chat.send("Please, share the phone no. first via /sharephoneloc")
 
     chat.send('Press /removekeyboard to remove the annoying keyboard')
 
@@ -82,7 +103,7 @@ def removekeyboard_command(chat, message):
     bot.api.call('sendMessage', {
         'chat_id': chat.id,
         'reply_to_message': message.id,
-        'text': 'keyboard removed.',
+        'text': 'keyboards removed.',
         'reply_markup': json.dumps({
             'remove_keyboard': True,
             # This 1 parameter below is optional
@@ -99,7 +120,7 @@ def requestkey_command(chat, message, args):
     key_phone = ""
     for k in r.keys():
         # print(k.decode('utf-8'))
-        dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "phoneno"))
+        dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
         if dict_nested2_val2['username'] == message.sender.username:
             key_phone = k.decode('utf-8')
 
@@ -121,7 +142,7 @@ def requestkey_command(chat, message, args):
 
         chat.send("Okay! Select one of the products below -\nA - Android \nB - Windows", attach= btns)
     else:
-        chat.send("Please, share the phone no. first via /sharephone")
+        chat.send("Please, share the phone no. first via /sharephoneloc")
         # chat.send("phone no. is: {phone}".format(phone= key_phone))  # for DEBUG
 
 # ----------------------------------------------------------------Product buttons CALLBACK------------------------------------------------------------------
@@ -226,16 +247,45 @@ def shareinfoa_command(chat, message, args):
     key_phone = ""
     for k in r.keys():
         # print(k.decode('utf-8'))
-        dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "phoneno"))
+        dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
         if dict_nested2_val2['username'] == message.sender.username:
             key_phone = k.decode('utf-8')
 
+    bot.api.call('sendMessage', {
+        'chat_id': chat.id,
+        'text': 'Please click on keyboard below to share your location',
+        'reply_markup': json.dumps({
+            'keyboard': [
+                [
+                    {
+                        'text': 'location',
+                        'request_location': True,
+                    },
+                    # {
+                    #     'text': 'Phone no.',
+                    #     'request_contact': True,
+                    # },
+                ],
+            ],
+            # These 3 parameters below are optional
+            # See https://core.telegram.org/bots/api#replykeyboardmarkup
+            'resize_keyboard': True,
+            'one_time_keyboard': True,
+            'selective': True,
+        }),
+    })
+
+    lat = message.location.latitude
+    lon = message.location.longitude
+    geo_URL = google_str_geo.format(lat= lat, lon= lon)
+
     response = requests.get(geo_URL, verify= False)
+    
     response_json = response.json()     # type - 'dict'
 
     if key_phone != "":
-        if response.status_code == 200:
-            country_name = response_json.get("country_name")
+        if response_json["status"] == "OK":
+            country_name = response_json["results"][0]["address_components"][6]["long_name"]
             chat.send('Country: \'{country}\' noted'.format(country= country_name))
             chat.send('Username: \'{username}\' noted'.format(username= uname))
 
@@ -282,7 +332,7 @@ def shareinfoa_command(chat, message, args):
         else:
             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
     else:
-        chat.send("Please, share the phone no. first via /sharephone")
+        chat.send("Please, share the phone no. first via /sharephoneloc")
 
 # =========================================================User Information for Product A==============================================================
 @bot.command("shareinfob")
@@ -296,7 +346,7 @@ def shareinfob_command(chat, message, args):
     key_phone = ""
     for k in r.keys():
         # print(k.decode('utf-8'))
-        dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "phoneno"))
+        dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
         if dict_nested2_val2['username'] == message.sender.username:
             key_phone = k.decode('utf-8')
 
@@ -352,7 +402,7 @@ def shareinfob_command(chat, message, args):
         else:
             chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
     else:
-        chat.send("Please, share the phone no. first via /sharephone")
+        chat.send("Please, share the phone no. first via /sharephoneloc")
 
 # ======================================================Key Usage Stats==========================================================
 # @bot.command("keystatsa")
