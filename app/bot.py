@@ -157,16 +157,9 @@ def requestkey_command(chat, message, args):
 
     if key_phone != "":
         """
-        TODO: Check if the user is/not in a channel
-        If(message.sender.group != group_name):
-            chat.send("You need to be in the group,\n" + group_link + " in order to get key")
-        else:
-            btns = botogram.Buttons()
-            ........
-            .......
-            ....
+        Check if the user is/not in a channel
         """
-        status = 
+        status = bot.api.call("getChatMember", {"chat_id": chat.id, "user_id": message.sender.id})
         if status['ok'] == True and status["result"]['status'] == 'member':
             btns = botogram.Buttons()
             
