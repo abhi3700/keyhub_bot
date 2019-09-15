@@ -488,7 +488,8 @@ def shareinfob_command(chat, message, args):
 @bot.command("channelstatus")
 def channelstatus_command(chat, message, args):
     """shows the channel status of a user - joined or not"""
-    status = chat.status_of(message.sender.username)
+    
+    status = bot.api.call("getChatMember", {"chat_id": chat.id, "user_id": message.sender.id})
     chat.send("*%s*" % status)
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
