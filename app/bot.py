@@ -119,7 +119,7 @@ def button_messages_are_like_normal_messages(chat, message):
             r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
                                                      lat= message.location.latitude,
                                                      lon= message.location.longitude,
-                                                     datetoday= datetime.date.today())))
+                                                     datetoday= str(datetime.date.today()))))
 
             # chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
             chat.send("Okay! But I need some of your information. \nUse /requestkey command.")

@@ -33,6 +33,10 @@ response_json = response.json()
 # print(response.status_code)
 print(response_json["status"])
 print(response_json["results"][0]["address_components"][6]["long_name"])
+print(response_json["results"][0]["formatted_address"])
+country_name = response_json["plus_code"]["compound_code"].rstrip(',')
+print(response_json["plus_code"]["compound_code"])
+print(country_name)
 
 # if response_json["status"] == "OK":
 #     print("connection established")
