@@ -484,6 +484,12 @@ def shareinfob_command(chat, message, args):
 #             chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
 #     else:
 #         chat.send("No product keys accessed.")
+
+@bot.command("channelstatus")
+def channelstatus_command(chat, message, args):
+    """shows the channel status of a user - joined or not"""
+    status = chat.status_of(int(args[0]))
+    chat.send("*%s*" % status)
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
     bot.run()
