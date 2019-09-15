@@ -166,15 +166,19 @@ def requestkey_command(chat, message, args):
             .......
             ....
         """
-        btns = botogram.Buttons()
-        
-        btns[0].callback("A", "producta")     # button - Product A
-        btns[0].callback("B", "productb")     # button - Product B
-        # btns[0].callback("C", "productc")     # button - Product C
-        # btns[0].callback("D", "productd")     # button - Product D
-        # btns[0].callback("E", "producte")     # button - Product E
+        status = 
+        if status['ok'] == True and status["result"]['status'] == 'member':
+            btns = botogram.Buttons()
+            
+            btns[0].callback("A", "producta")     # button - Product A
+            btns[0].callback("B", "productb")     # button - Product B
+            # btns[0].callback("C", "productc")     # button - Product C
+            # btns[0].callback("D", "productd")     # button - Product D
+            # btns[0].callback("E", "producte")     # button - Product E
 
-        chat.send("Okay! Select one of the products below -\nA - Android \nB - Windows", attach= btns)
+            chat.send("Okay! Select one of the products below -\nA - Android \nB - Windows", attach= btns)
+        else:
+            chat.send("First, you need to be subscribe to this channel: ,\n" + channel_URL + " in order to access product key.")
     else:
         chat.send("Please, share the phone no. first via /sharephone")
         # chat.send("phone no. is: {phone}".format(phone= key_phone))  # for DEBUG
@@ -485,13 +489,14 @@ def shareinfob_command(chat, message, args):
 #     else:
 #         chat.send("No product keys accessed.")
 
-@bot.command("channelstatus")
-def channelstatus_command(chat, message, args):
-    """shows the channel status of a user - joined or not"""
+# Practice
+# @bot.command("channelstatus")
+# def channelstatus_command(chat, message, args):
+#     """shows the channel status of a user - joined or not"""
 
-    status = bot.api.call("getChatMember", {"chat_id": chat.id, "user_id": message.sender.id})
-    chat.send("*%s*" % status["ok"])
-    chat.send("*%s*" % status["result"]["status"])
+#     status = bot.api.call("getChatMember", {"chat_id": chat.id, "user_id": message.sender.id})
+#     chat.send("*%s*" % status["ok"])
+#     chat.send("*%s*" % status["result"]["status"])
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
     bot.run()
