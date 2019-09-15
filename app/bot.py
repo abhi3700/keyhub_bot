@@ -219,7 +219,7 @@ def shareinfoa_command(chat, message, args):
     uname = message.sender.username
 
     # find the root phoneno. if username is available in REDIS DB
-    chat.send('Finding if your username exists with us.....')
+    # chat.send('Finding if your username exists with us.....')
     key_phone = ""
     for k in r.keys():
         # print(k.decode('utf-8'))
@@ -238,7 +238,7 @@ def shareinfoa_command(chat, message, args):
         # if (lat != "") and (lon != ""):
         # if message.location:
         if datetoday == str(datetime.date.today()):
-            chat.send("Inside location if-else loop")      # for DEBUG
+            # chat.send("Inside location if-else loop")      # for DEBUG
 
             lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
             lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
@@ -249,7 +249,7 @@ def shareinfoa_command(chat, message, args):
             
             response_json = response.json()     # type - 'dict'
             if response_json["status"] == "OK":
-                country_name = response_json["results"][0]["address_components"][7]["long_name"]
+                country_name = response_json["results"][0]["address_components"][-2]["long_name"]
                 chat.send('Country: \'{country}\' noted'.format(country= country_name))
                 chat.send('Username: \'{username}\' noted'.format(username= uname))
 
