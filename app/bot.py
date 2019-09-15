@@ -161,7 +161,10 @@ def requestkey_command(chat, message, args):
         If(message.sender.group != group_name):
             chat.send("You need to be in the group,\n" + group_link + " in order to get key")
         else:
-            chat.send("Okay! But I need some of your information. \nUse /sendinfo command.")
+            btns = botogram.Buttons()
+            ........
+            .......
+            ....
         """
         btns = botogram.Buttons()
         
@@ -214,7 +217,7 @@ def productb_callback(query, chat, message):
 # =========================================================User Information for Product A==============================================================
 @bot.command("shareinfoa")
 def shareinfoa_command(chat, message, args):
-    """User has to share information about product-A"""
+    """User has to share info for product-A key access"""
     # uname = query.sender.username
     uname = message.sender.username
 
@@ -235,9 +238,10 @@ def shareinfoa_command(chat, message, args):
         # lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
         datetoday = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("datetoday")
 
-        # if (lat != "") and (lon != ""):
-        # if message.location:
-        if datetoday == str(datetime.date.today()):
+        """
+        Here, to ensure the location is latest (during product key access), datetoday has to be matched with the one stored in "info" dict_key
+        """
+        if datetoday == str(datetime.date.today()):     # today's date has to be matched with the one stored in "info" dict_key
             # chat.send("Inside location if-else loop")      # for DEBUG
 
             lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
@@ -303,70 +307,90 @@ def shareinfoa_command(chat, message, args):
 # =========================================================User Information for Product A==============================================================
 @bot.command("shareinfob")
 def shareinfob_command(chat, message, args):
-    """User has to share information about product-A"""
+    """User has to share info for product-B key access"""
     # uname = query.sender.username
     uname = message.sender.username
 
     # find the root phoneno. if username is available in REDIS DB
-    chat.send('Finding if your username exists with us.....')
+    # chat.send('Finding if your username exists with us.....')
     key_phone = ""
     for k in r.keys():
         # print(k.decode('utf-8'))
         dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
         if dict_nested2_val2['username'] == message.sender.username:
             key_phone = k.decode('utf-8')
+    # chat.send("key_phone is: {key_phone}".format(key_phone= key_phone))   # for DEBUG
 
-    response = requests.get(geo_URL, verify= False)
-    response_json = response.json()     # type - 'dict'
 
     if key_phone != "":
-        if response.status_code == 200:
-            country_name = response_json.get("country_name")
-            chat.send('Country: \'{country}\' noted'.format(country= country_name))
-            chat.send('Username: \'{username}\' noted'.format(username= uname))
+        # chat.send("Inside key_phone if-else loop")      # for DEBUG
+        # lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
+        # lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
+        datetoday = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("datetoday")
 
-            # Read the SQL table
-            chat.send("Please wait...")
-            # chat.send("Reading the SQL database. Please wait...")   # for DEBUG
-            df_sql = pd.read_sql_table('product_b', sqlengine)
+        """
+        Here, to ensure the location is latest (during product key access), datetoday has to be matched with the one stored in "info" dict_key
+        """
+        if datetoday == str(datetime.date.today()):     # today's date has to be matched with the one stored in "info" dict_key
+            # chat.send("Inside location if-else loop")      # for DEBUG
 
-            """ Fetch 'product_key' from DB (in excel) with username & country & phone as empty."""
-            df_nan = df_sql[(df_sql['country'].isnull()) & (df_sql['username'].isnull()) & (df_sql['phone'].isnull())]
+            lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
+            lon = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lon")
+
+            geo_URL = google_str_geo.format(lat= lat, lon= lon)
+
+            response = requests.get(geo_URL, verify= False)
             
-            if len(df_nan) != 0:    # check if `df_nan` is not empty
-                df_nan.fillna('', inplace=True)     # replace 'NaN' with empty/blank string, bcoz when empty `df_nan`, then can't put value due to datatype mismatch (float vs str) 
-                ind = df_nan.index.tolist()[0]
-                key = df_nan.loc[ind, 'keys']
-                chat.send("your key is \n{productkey}".format(productkey= key))
+            response_json = response.json()     # type - 'dict'
+            if response_json["status"] == "OK":
+                country_name = response_json["results"][0]["address_components"][-2]["long_name"]
+                chat.send('Country: \'{country}\' noted'.format(country= country_name))
+                chat.send('Username: \'{username}\' noted'.format(username= uname))
 
-                """ Now, note the username, country, key, datetime in Redis DB"""
-                r.hset(key_phone, "product_b", 
-                    json.dumps(dict(username= uname, 
-                                    country= country_name, 
-                                    key= key, 
-                                    datetime= str(datetime.date.today())
-                                    )))
+                # Read the SQL table
+                chat.send("Please wait...")
+                # chat.send("Reading the SQL database. Please wait...")   # for DEBUG
+                df_sql = pd.read_sql_table('product_b', sqlengine)
 
-                """ After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB. """
-                # chat.send("replacing [country, username, phone] in the dataframe- `df_nan`. Please wait....")   # for DEBUG
-                df_nan.at[ind, 'country'] = country_name
-                df_nan.at[ind, 'username'] = uname
-                df_nan.at[ind, 'phone'] = key_phone
+                """ Fetch 'product_key' from DB (in excel) with username & country & phone as empty."""
+                df_nan = df_sql[(df_sql['country'].isnull()) & (df_sql['username'].isnull()) & (df_sql['phone'].isnull())]
+                
+                if len(df_nan) != 0:    # check if `df_nan` is not empty
+                    df_nan.fillna('', inplace=True)     # replace 'NaN' with empty/blank string, bcoz when empty `df_nan`, then can't put value due to datatype mismatch (float vs str) 
+                    ind = df_nan.index.tolist()[0]
+                    key = df_nan.loc[ind, 'keys']
+                    chat.send("your key is \n{productkey}".format(productkey= key))
 
-                # replace the ith row (as per index) of df_sql (for e.g.) with df_nan
-                df_sql.loc[ind] = df_nan.loc[ind]
+                    """ Now, note the username, country, key, datetime in Redis DB"""
+                    r.hset(key_phone, "product_b", 
+                        json.dumps(dict(username= uname, 
+                                        country= country_name, 
+                                        key= key, 
+                                        datetime= str(datetime.date.today())
+                                        )))
 
-                # write the modified dataframe to PostgreSQL table
-                chat.send("Few more seconds, please.....")
-                # chat.send("Uploading modified dataframe to the SQL database. Please wait....")      # for DEBUG
-                du.pd_to_psql(df_sql, cfg_uri_psql, 'product_b', if_exists='replace')
-                # chat.send("user details saved in PostgreSQL")   # for DEBUG
-                chat.send("DONE! \nFor more, use /help command.")
+                    """ After this, corresponding to this product_key save infos. - username, location, phone is filled in Excel DB. """
+                    # chat.send("replacing [country, username, phone] in the dataframe- `df_nan`. Please wait....")   # for DEBUG
+                    df_nan.at[ind, 'country'] = country_name
+                    df_nan.at[ind, 'username'] = uname
+                    df_nan.at[ind, 'phone'] = key_phone
+
+                    # replace the ith row (as per index) of df_sql (for e.g.) with df_nan
+                    df_sql.loc[ind] = df_nan.loc[ind]
+
+                    # write the modified dataframe to PostgreSQL table
+                    chat.send("Few more seconds, please.....")
+                    # chat.send("Uploading modified dataframe to the SQL database. Please wait....")      # for DEBUG
+                    du.pd_to_psql(df_sql, cfg_uri_psql, 'product_b', if_exists='replace')
+                    # chat.send("user details saved in PostgreSQL")   # for DEBUG
+                    chat.send("DONE! \nFor more, use /help command.")
+                else:
+                    chat.send("SORRY! \nNo more keys are available. So, please ask @abhi3700 to append more keys.")
+
             else:
-                chat.send("SORRY! \nNo more keys are available. So, please ask @abhi3700 to append more keys.")
-
+                chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
         else:
-            chat.send("Connection ERROR! Please try again later.\nAlso, you can raise query at @abhi3700")
+            chat.send("Please, share your location via /shareloc")
     else:
         chat.send("Please, share the phone no. first via /sharephone")
 
@@ -460,22 +484,6 @@ def shareinfob_command(chat, message, args):
 #             chat.send("{key}\n".format(key= df_search['keys'].tolist()[k]))
 #     else:
 #         chat.send("No product keys accessed.")
-    
-@bot.command("rgeocode")
-def rgeocode_command(chat, message, args):
-    """test google geocoding API"""
-    lat = 30.704026
-    lon = 76.681145
-
-    geo_URL = google_str_geo.format(lat= lat, lon= lon)
-    response = requests.get(geo_URL, verify= False)
-
-    response_json = response.json()
-
-    # print(response.status_code)
-    chat.send(response_json["status"])
-    chat.send(response_json["results"][0]["address_components"][6]["long_name"])
-
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
     bot.run()

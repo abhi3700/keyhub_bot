@@ -1,11 +1,11 @@
 // This database gets created in the REDIS database
 {
 	"+918145634656": {
-        "info": {        // this is to store the phoneno & username during contact share.
+        "info": {        // this is to store the username, location, datetoday during contact share.
             "username": "abhi3701",
-            "lat": "30.928954",
-            "lon": "76.673643",
-            "datetoday": "2019-09-14"            
+            "lat": "30.928954",     // latest lat
+            "lon": "76.673643",     // latest lon
+            "datetoday": "2019-09-14",   // this is to for ensuring that the location is latest as much as possible.      
         },
         "product_a": {
             "username": "abhi3701",
@@ -25,10 +25,10 @@
 	},
 	// ---------------------------------------------------------------------------------------------
 	"+15417543010": {
-        "info": {        // this is to store the phoneno & username during contact share.
+        "info": {        // this is to store the username, location, datetoday during contact share.
             "username": "abhi3701",
-            "lat": "36.705799",
-            "lon": "-120.112735",
+            "lat": "36.705799",     // latest lat
+            "lon": "-120.112735",   // latest lon
             "datetoday": "2019-09-14"            
         },
         "product_a": {
