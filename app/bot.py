@@ -237,7 +237,7 @@ def shareinfoa_command(chat, message, args):
 
         # if (lat != "") and (lon != ""):
         # if message.location:
-        if datetoday == datetime.date.today():
+        if datetoday == str(datetime.date.today():
             chat.send("Inside location if-else loop")      # for DEBUG
 
             lat = json.loads(r.hget(key_phone, "info").decode('utf-8')).get("lat")
