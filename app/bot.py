@@ -159,8 +159,8 @@ def requestkey_command(chat, message, args):
         """
         Check if the user is/not in a channel
         """
-        status = bot.api.call("getChatMember", {"chat_id": '@test_keyhubbot', "user_id": message.sender.id})
-        if status['ok'] == True and status["result"]['status'] == 'member':
+        status = bot.api.call("getChatMember", {"chat_id": channel_id, "user_id": message.sender.id})
+        if status['ok'] == True and (status["result"]["status"] == 'member' or status["result"]["status"] == 'creator'):
             btns = botogram.Buttons()
             
             btns[0].callback("A", "producta")     # button - Product A
@@ -171,7 +171,7 @@ def requestkey_command(chat, message, args):
 
             chat.send("Okay! Select one of the products below -\nA - Android \nB - Windows", attach= btns)
         else:
-            chat.send("First, you need to be subscribe to this channel: ,\n" + channel_URL + " in order to access product key.")
+            chat.send("First, you need to subscribe to this channel: ,\n" + channel_URL + " in order to access product key.")
     else:
         chat.send("Please, share the phone no. first via /sharephone")
         # chat.send("phone no. is: {phone}".format(phone= key_phone))  # for DEBUG
@@ -487,7 +487,8 @@ def shareinfob_command(chat, message, args):
 # def channelstatus_command(chat, message, args):
 #     """shows the channel status of a user - joined or not"""
 
-#     status = bot.api.call("getChatMember", {"chat_id": chat.id, "user_id": message.sender.id})
+#     # status = bot.api.call("getChatMember", {"chat_id": chat.id, "user_id": message.sender.id})
+#     status = bot.api.call("getChatMember", {"chat_id": "@test_keyhubbot", "user_id": message.sender.id})    # gives `creator` if you are admin
 #     chat.send("*%s*" % status["ok"])
 #     chat.send("*%s*" % status["result"]["status"])
 # ================================================MAIN===========================================================================

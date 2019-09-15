@@ -10,3 +10,6 @@ cfg_uri_psql = "postgresql+psycopg2://sncwwevyyzviez:7569a516be40f3f5d62f6d6a881
 
 # Accesssing 'country_name' from this reverse geocoding of lat,lon, obtained from Telegram service
 google_str_geo = "https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key=AIzaSyDiMMj4cr8_OEREgaTyJjUvAB1Hd38LgLY"
+
+channel_URL = "https://t.me/test_keyhubbot"
+channel_id = '@test_keyhubbot'
