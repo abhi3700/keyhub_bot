@@ -159,7 +159,7 @@ def requestkey_command(chat, message, args):
         """
         Check if the user is/not in a channel
         """
-        status = bot.api.call("getChatMember", {"chat_id": chat.id, "user_id": message.sender.id})
+        status = bot.api.call("getChatMember", {"chat_id": '@test_keyhubbot', "user_id": message.sender.id})
         if status['ok'] == True and status["result"]['status'] == 'member':
             btns = botogram.Buttons()
             
