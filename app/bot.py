@@ -116,26 +116,26 @@ def button_messages_are_like_normal_messages(chat, message):
         chat.send("Now, please share your location via /shareloc")
         # chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
 
-    elif message.location:
-        # find the root phoneno. if username is available in REDIS DB
-        key_phone = ""
-        for k in r.keys():
-            # print(k.decode('utf-8'))
-            dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
-            if dict_nested2_val2['username'] == message.sender.username:
-                key_phone = k.decode('utf-8')
+    # elif message.location:
+    #     # find the root phoneno. if username is available in REDIS DB
+    #     key_phone = ""
+    #     for k in r.keys():
+    #         # print(k.decode('utf-8'))
+    #         dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+    #         if dict_nested2_val2['username'] == message.sender.username:
+    #             key_phone = k.decode('utf-8')
 
-        if key_phone != "":
-            # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
-            r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
-                                                     lat= message.location.latitude,
-                                                     lon= message.location.longitude,
-                                                     datetoday= str(datetime.date.today()))))
+    #     if key_phone != "":
+    #         # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
+    #         r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
+    #                                                  lat= message.location.latitude,
+    #                                                  lon= message.location.longitude,
+    #                                                  datetoday= str(datetime.date.today()))))
 
-            # chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
-            chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
-        else:
-            chat.send("Please, share the phone no. first via /sharephone")
+    #         # chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
+    #         chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
+    #     else:
+    #         chat.send("Please, share the phone no. first via /sharephone")
 
     chat.send('Press /removekeyboard to remove the annoying keyboard')
 
@@ -513,6 +513,33 @@ def shareinfob_command(chat, message, args):
 #     status = bot.api.call("getChatMember", {"chat_id": "@test_keyhubbot", "user_id": message.sender.id})    # gives `creator` if you are admin
 #     chat.send("*%s*" % status["ok"])
 #     chat.send("*%s*" % status["result"]["status"])
+@bot.command("locval")
+def locval_command(chat, message, args):
+    msg = bot.api.call('sendMessage', {
+            'chat_id': chat.id,
+            'text': 'Please click on keyboard below to share your location',
+            'reply_markup': json.dumps({
+                'keyboard': [
+                    [
+                        {
+                            'text': 'location',
+                            'request_location': True,
+                        },
+                        # {
+                        #     'text': 'Phone no.',
+                        #     'request_contact': True,
+                        # },
+                    ],
+                ],
+                # These 3 parameters below are optional
+                # See https://core.telegram.org/bots/api#replykeyboardmarkup
+                'resize_keyboard': True,
+                'one_time_keyboard': True,
+                'selective': True,
+            }),
+        })
+    chat.send("latitude: {lat}".format(lat= msg.location.latitude))
+    chat.send("longitude: {lat}".format(lat= msg.longitude))
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
     bot.run()
