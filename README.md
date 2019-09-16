@@ -45,3 +45,6 @@ A key provider to End users based on their data
 * <u>__sequential product key dispersal:__</u> A user can avail the product key only if the info. shared in this sequence - `[username --> location]`
 * segregate b/w key_count_total, key_count_today
 
+## Troubleshooting
+* PostgreSQL Database ERROR
+	- Just keep your default browser logged in with Heroku account, as created service from here.
