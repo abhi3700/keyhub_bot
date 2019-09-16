@@ -101,4 +101,3 @@ for k in r.keys():
     k_decoded = k.decode('utf-8')
     # print(json.loads(r.hget(k_decoded, "product_a").decode('utf-8')))
     print(json.loads(r.hget(k_decoded, "info").decode('utf-8')))
-    print(json.loads(r.hget(k_decoded, "info").decode('utf-8')).get("lat"))
