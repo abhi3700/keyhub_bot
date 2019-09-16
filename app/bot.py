@@ -93,51 +93,51 @@ def shareloc_command(chat, message, args):
 #     chat.send('Processing Action A... This won\'t trigger @bot.process_message')
 
 
-@bot.process_message
-def button_messages_are_like_normal_messages(chat, message):
-    # if message.text:
-    #     chat.send('You choose %s' % message.text)
-    if message.contact:
-        phoneno = message.contact.phone_number
-        phoneno = phoneno.replace("+", "")      # '+91343242343' --> '91343242343'Unlike phone app, in Telegram desktop app, it's '+' sign in phone no.
+# @bot.process_message
+# def button_messages_are_like_normal_messages(chat, message):
+#     # if message.text:
+#     #     chat.send('You choose %s' % message.text)
+#     if message.contact:
+#         phoneno = message.contact.phone_number
+#         phoneno = phoneno.replace("+", "")      # '+91343242343' --> '91343242343'Unlike phone app, in Telegram desktop app, it's '+' sign in phone no.
 
-        # Create a node - `phone` and store `username` in REDIS DB. This is bcoz in botogram, can't set global_variable.
-        r.hset(phoneno, "info", json.dumps(dict(username= message.sender.username)))
+#         # Create a node - `phone` and store `username` in REDIS DB. This is bcoz in botogram, can't set global_variable.
+#         r.hset(phoneno, "info", json.dumps(dict(username= message.sender.username)))
 
-        # find the root phoneno. if username is available in REDIS DB
-        key_phone = ""
-        for k in r.keys():
-            # print(k.decode('utf-8'))
-            dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
-            if dict_nested2_val2['username'] == message.sender.username:
-                key_phone = k.decode('utf-8')
+#         # find the root phoneno. if username is available in REDIS DB
+#         key_phone = ""
+#         for k in r.keys():
+#             # print(k.decode('utf-8'))
+#             dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+#             if dict_nested2_val2['username'] == message.sender.username:
+#                 key_phone = k.decode('utf-8')
 
-        chat.send('You choose to send your contact no.: \'{phone}\''.format(phone= key_phone))
-        chat.send("Now, please share your location via /shareloc")
-        # chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
+#         chat.send('You choose to send your contact no.: \'{phone}\''.format(phone= key_phone))
+#         chat.send("Now, please share your location via /shareloc")
+#         # chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
 
-    # elif message.location:
-    #     # find the root phoneno. if username is available in REDIS DB
-    #     key_phone = ""
-    #     for k in r.keys():
-    #         # print(k.decode('utf-8'))
-    #         dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
-    #         if dict_nested2_val2['username'] == message.sender.username:
-    #             key_phone = k.decode('utf-8')
+#     elif message.location:
+#         # find the root phoneno. if username is available in REDIS DB
+#         key_phone = ""
+#         for k in r.keys():
+#             # print(k.decode('utf-8'))
+#             dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+#             if dict_nested2_val2['username'] == message.sender.username:
+#                 key_phone = k.decode('utf-8')
 
-    #     if key_phone != "":
-    #         # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
-    #         r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
-    #                                                  lat= message.location.latitude,
-    #                                                  lon= message.location.longitude,
-    #                                                  datetoday= str(datetime.date.today()))))
+#         if key_phone != "":
+#             # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
+#             r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
+#                                                      lat= message.location.latitude,
+#                                                      lon= message.location.longitude,
+#                                                      datetoday= str(datetime.date.today()))))
 
-    #         # chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
-    #         chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
-    #     else:
-    #         chat.send("Please, share the phone no. first via /sharephone")
+#             # chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
+#             chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
+#         else:
+#             chat.send("Please, share the phone no. first via /sharephone")
 
-    chat.send('Press /removekeyboard to remove the annoying keyboard')
+#     chat.send('Press /removekeyboard to remove the annoying keyboard')
 
 @bot.command("removekeyboard")
 def removekeyboard_command(chat, message):
@@ -515,7 +515,7 @@ def shareinfob_command(chat, message, args):
 #     chat.send("*%s*" % status["result"]["status"])
 @bot.command("locval")
 def locval_command(chat, message, args):
-    msg = bot.api.call('sendMessage', {
+    bot.api.call('sendMessage', {
             'chat_id': chat.id,
             'text': 'Please click on keyboard below to share your location',
             'reply_markup': json.dumps({
@@ -538,7 +538,30 @@ def locval_command(chat, message, args):
                 'selective': True,
             }),
         })
-    chat.send("latitude: {lat}".format(lat= msg))
+    @bot.process_message
+    def button_messages_are_like_normal_messages(chat, message):
+        if message.location:
+            # find the root phoneno. if username is available in REDIS DB
+            # key_phone = ""
+            # for k in r.keys():
+            #     # print(k.decode('utf-8'))
+            #     dict_nested2_val2 = json.loads(r.hget(k.decode('utf-8'), "info"))
+            #     if dict_nested2_val2['username'] == message.sender.username:
+            #         key_phone = k.decode('utf-8')
+
+            # if key_phone != "":
+            #     # Create a node - `phone` and store `username`, `latitude`, `longitude` in REDIS DB. This is bcoz in botogram, can't set global_variable.
+            #     r.hset(key_phone, "info", json.dumps(dict(username= message.sender.username,
+            #                                              lat= message.location.latitude,
+            #                                              lon= message.location.longitude,
+            #                                              datetoday= str(datetime.date.today()))))
+
+            #     # chat.send('You choose to send your location: %s %s' % (message.location.latitude, message.location.longitude))
+            #     chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
+            # else:
+            #     chat.send("Please, share the phone no. first via /sharephone")
+            chat.send("latitude: {lat}".format(lat= message.location.latitude))
+    # chat.send("latitude: {lat}".format(lat= msg))
     # chat.send("longitude: {lat}".format(lat= msg))
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
