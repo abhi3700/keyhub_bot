@@ -538,7 +538,7 @@ def locval_command(chat, message, args):
                 'selective': True,
             }),
         })
-    chat.send("latitude: {lat}".format(lat= msg.location.latitude))
+    chat.send("latitude: {lat}".format(lat= msg.latitude))
     chat.send("longitude: {lat}".format(lat= msg.longitude))
 # ================================================MAIN===========================================================================
 if __name__ == "__main__":
