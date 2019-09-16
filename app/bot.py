@@ -112,7 +112,7 @@ def button_messages_are_like_normal_messages(chat, message):
             if dict_nested2_val2['username'] == message.sender.username:
                 key_phone = k.decode('utf-8')
 
-        chat.send('You choose to send your contact no.: {phone}'.format(phone= key_phone))
+        chat.send('You choose to send your contact no.: \'{phone}\''.format(phone= key_phone))
         chat.send("Now, please share your location via /shareloc")
         # chat.send("Okay! But I need some of your information. \nUse /requestkey command.")
 
