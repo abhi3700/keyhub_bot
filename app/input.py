@@ -9,7 +9,10 @@ DATABASE_URL = "postgres://sncwwevyyzviez:7569a516be40f3f5d62f6d6a8818556771c5f1
 cfg_uri_psql = "postgresql+psycopg2://sncwwevyyzviez:7569a516be40f3f5d62f6d6a8818556771c5f1ade86096b96dabeb01bef14c37@ec2-54-247-96-169.eu-west-1.compute.amazonaws.com:5432/dm8m5ustplad3"
 
 # Accesssing 'country_name' from this reverse geocoding of lat,lon, obtained from Telegram service
+# Google cloud Geocoding API
 google_str_geo = "https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key=AIzaSyDiMMj4cr8_OEREgaTyJjUvAB1Hd38LgLY"
+# Nominatim Openstreet API
+# nominatim_str_geo = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={lat}&lon={lon}"
 
 channel_URL = "https://t.me/test_keyhubbot"
 channel_id = '@test_keyhubbot'
