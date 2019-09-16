@@ -32,7 +32,7 @@ def sharephone_command(chat, message, args):
     if status['ok'] == True and (status["result"]["status"] == 'member' or status["result"]["status"] == 'creator'):
         bot.api.call('sendMessage', {
             'chat_id': chat.id,
-            'text': 'Please click on keyboard below to share your phone no.',
+            'text': 'Please click on \'Phone no.\' button below to share your phone no.',
             'reply_markup': json.dumps({
                 'keyboard': [
                     [
@@ -64,12 +64,12 @@ def shareloc_command(chat, message, args):
     if status['ok'] == True and (status["result"]["status"] == 'member' or status["result"]["status"] == 'creator'):
         bot.api.call('sendMessage', {
             'chat_id': chat.id,
-            'text': 'Please click on keyboard below to share your location',
+            'text': 'Please click on \'Location\' button below to share your location',
             'reply_markup': json.dumps({
                 'keyboard': [
                     [
                         {
-                            'text': 'location',
+                            'text': 'Location',
                             'request_location': True,
                         },
                         # {
