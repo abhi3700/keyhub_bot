@@ -1,6 +1,6 @@
 // This database gets created in the REDIS database
 {
-	"+918145634656": {
+	"918145634656": {
         "info": {        // this is to store the username, location, datetoday during contact share.
             "username": "abhi3701",
             "lat": "30.928954",     // latest lat
@@ -12,19 +12,16 @@
             "country": "India",
             "key": "Alltest2438542342374",	// last accessed product key
             "datetime": "2019-09-29",	// change datetime during key access
-            }
         },
-		
         "product_b": {
             "username": "abhi3701",
             "country": "India",
             "key": "Alltest542342374",	// last accessed product key
             "datetime": "2019-09-30",	// change datetime during key access
-            }
-        },
-	},
-	// ---------------------------------------------------------------------------------------------
-	"+15417543010": {
+        }
+    },
+// ---------------------------------------------------------------------------------------------
+	"15417543010": {
         "info": {        // this is to store the username, location, datetoday during contact share.
             "username": "abhi3701",
             "lat": "36.705799",     // latest lat
@@ -36,13 +33,12 @@
             "country": "US",
             "key": "Alltest438543342374",	// last accessed product key
             "datetime": "2019-09-27",	// change datetime during key access
-            }
         },
         "product_b": {
             "username": "scl4623",
             "country": "US",
             "key": "Alltest543342374",	// last accessed product key
             "datetime": "2019-09-21",	// change datetime during key access
-            }
+        }
 	},
 }
