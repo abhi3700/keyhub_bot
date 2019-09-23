@@ -320,7 +320,7 @@ def shareinfoa_command(chat, message, args):
 # =========================================================User Information for Product A==============================================================
 @bot.command("shareinfob")
 def shareinfob_command(chat, message, args):
-    """User has to share info for product-A key access"""
+    """User has to share info for product-B key access"""
     # uname = query.sender.username
     uname = message.sender.username
 
