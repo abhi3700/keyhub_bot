@@ -1,0 +1,3 @@
+- key access limit (e.g. 24 'H' for 'N' keys), where H, N are variable
+- auto-remove keyboard
+- auto-clear past messages
